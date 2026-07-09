@@ -1,0 +1,598 @@
+PRODUCT REQUIREMENTS DOCUMENT
+AI-Powered Smart Pharmacy & Telemedicine Platform
+A Unified Digital Ecosystem for Medicine Access, Doctor Consultation, and AI-Guided Healthcare
+Prepared for: IEEE Internship Program
+Document Type: Product Requirements Document (PRD)
+Version: 1.0
+Date: July 2026
+
+Table of Contents
+
+
+
+1. Executive Summary
+The AI-Powered Smart Pharmacy and Telemedicine Platform is a unified web-based healthcare ecosystem that merges online pharmacy operations, doctor appointment management, secure video-based telemedicine, and an AI conversational assistant into a single product. The platform is designed to reduce the friction patients experience today: fragmented apps for ordering medicine, separate portals for booking doctors, and no single place to retrieve past prescriptions or consultation history.
+This document defines the product scope, functional and non-functional requirements, system architecture, data model, user flows, API surface, and delivery milestones needed to design, build, and evaluate the platform as an IEEE internship deliverable. It is intended to be read by the engineering team building the product, the mentor/reviewer evaluating the internship output, and any stakeholder assessing feasibility.
+1.1 Product Vision
+To become a single trusted digital front door for a patient's healthcare journey — from symptom-related questions and medicine information, to booking a doctor, attending a consultation, receiving a digital prescription, and ordering the prescribed medicine — all inside one platform, guided by an AI assistant that is transparent about its limitations.
+1.2 Problem Statement
+Patients today face three compounding problems:
+Information gap: patients lack an easy, reliable way to check medicine usage, dosage, precautions, and side effects before or after a doctor visit.
+Fragmentation: pharmacy ordering, doctor booking, and consultation happen on different, disconnected platforms, causing repeated data entry and lost history.
+Access friction: booking a relevant specialist, tracking an order, or retrieving an old prescription is slow, manual, and often requires a phone call or an in-person visit.
+The proposed platform addresses all three by combining an AI assistant, an e-pharmacy module, and a telemedicine module under one authenticated account with a shared health record.
+1.3 Target Users
+Patients / End Users — individuals seeking medicine information, ordering prescriptions, or booking doctor consultations.
+Doctors / Healthcare Providers — professionals managing their availability, conducting video consultations, and issuing digital prescriptions.
+Pharmacy Administrators — staff managing medicine inventory, verifying prescriptions, and processing orders.
+Platform Administrators — internal team managing users, doctors, catalog data, and monitoring system health.
+1.4 Key Success Metrics (Internship Deliverable Scope)
+Metric
+Target for Prototype
+Rationale
+Functional core flows working end-to-end
+3 of 3 (order, appointment, teleconsult)
+Demonstrates full-stack integration, not just UI mockups
+AI assistant response relevance (manual review)
+≥ 80% judged helpful/accurate on test query set
+Validates AI integration quality
+Page load time (key screens)
+< 2.5s on broadband
+Baseline UX performance bar
+Critical bugs at demo
+0 blocking issues
+Demo readiness for IEEE evaluation
+
+2. Scope
+2.1 In Scope (Version 1.0 / Internship Deliverable)
+Patient-facing web application (responsive, desktop + mobile browser).
+AI Healthcare Assistant chatbot (medicine information, symptom-to-specialization guidance, FAQ, navigation help).
+Medicine catalog, search, cart, checkout, and prescription upload for regulated (Schedule H / prescription-required) medicines.
+Order tracking with status lifecycle (placed → verified → packed → shipped → delivered).
+Doctor directory with specialization/availability filters.
+Appointment booking, rescheduling, cancellation, and automated reminders (email/SMS simulation acceptable for prototype).
+WebRTC-based one-to-one video consultation room.
+Digital prescription generation by doctor post-consultation, stored against the patient record.
+Digital health record: consultation history, prescriptions, past orders, viewable/downloadable by the patient.
+Role-based authentication for Patient, Doctor, Pharmacy Admin, and Platform Admin.
+Basic admin dashboard for medicine inventory and doctor/user management.
+2.2 Out of Scope (Explicitly Deferred)
+Real-time payment gateway settlement with a live payment processor (a sandbox/mock payment flow is acceptable for the prototype).
+Regulatory certification / legal licensing as a pharmacy (e.g., government drug-license registration) — the platform is a technology demonstrator, not a licensed pharmacy at this stage.
+Native iOS/Android mobile apps (responsive web only in this phase).
+Multi-language localization beyond English.
+Insurance claim processing and integration.
+AI-driven diagnosis or treatment prescription — the AI assistant strictly provides informational support, never a diagnosis or treatment decision (see Section 6.5 and Section 11 for safety constraints).
+2.3 Assumptions
+Doctors onboarded onto the platform are pre-verified by the Pharmacy/Platform Admin outside of the AI assistant's scope.
+Users have a stable internet connection sufficient for WebRTC video (minimum ~1 Mbps upload/download).
+The Gemini 2.5 Flash API is used strictly for informational Q&A and semantic search assistance, not as a medical decision-maker.
+2.4 Constraints
+Internship program timeline — the delivery plan (Section 13) assumes a constrained build window and phases features accordingly.
+Team likely to be a small group of student developers — architecture favors a modular monolith over microservices for maintainability (see Section 7).
+No dedicated DevOps/SRE role assumed — cloud services chosen (Firebase/AWS) favor managed infrastructure over self-hosted ops.
+
+3. User Personas
+3.1 Persona: Patient — "Anika, 29, Working Professional"
+Goals: quickly understand what a prescribed medicine does, reorder monthly medication without visiting a store, book a dermatologist without calling a clinic.
+Pain points: doesn't remember dosage instructions after leaving the clinic; wastes time comparing pharmacy apps and doctor-booking apps separately.
+Needs from platform: fast AI answers on medicine usage, one-tap reorder, appointment reminders.
+3.2 Persona: Doctor — "Dr. Rao, 41, General Physician"
+Goals: manage a predictable consultation schedule, issue prescriptions digitally without paperwork, review a patient's past visits before a consult.
+Pain points: no-shows, manual prescription writing, no visibility into a patient's medicine order history.
+Needs from platform: calendar/availability control, in-consult access to patient history, one-click digital prescription issuance.
+3.3 Persona: Pharmacy Admin — "Meera, 35, Pharmacy Operations Lead"
+Goals: keep inventory accurate, verify prescription uploads before dispensing regulated medicine, fulfil orders on time.
+Pain points: manual prescription verification is slow and error-prone; stock-outs aren't visible until a customer complains.
+Needs from platform: verification queue with side-by-side prescription image and order details, low-stock alerts.
+3.4 Persona: Platform Admin — "Internal Ops"
+Goals: onboard/verify doctors, monitor system usage, moderate AI assistant conversations for safety flags.
+Needs from platform: role management, audit logs, AI conversation flagging dashboard.
+
+4. Core User Flows
+4.1 Flow: AI-Assisted Medicine Discovery & Order
+Patient opens AI Healthcare Assistant and asks a question (e.g., "What is this medicine used for and can I take it with paracetamol?").
+Assistant returns informational guidance and a clear disclaimer to consult a pharmacist/doctor for personal medical advice, then surfaces relevant catalog items.
+Patient adds medicine to cart; if the item is prescription-only, system prompts for prescription upload.
+Patient uploads prescription image/PDF; order enters "Pending Verification" status.
+Pharmacy Admin reviews and approves/rejects the prescription.
+On approval, payment is captured (mock/sandbox) and order proceeds to packing → shipped → delivered, with status visible to the patient throughout.
+4.2 Flow: Doctor Discovery, Booking & Teleconsultation
+Patient searches doctors by specialization, availability, and rating.
+Patient selects an open slot and confirms appointment; system sends confirmation and schedules a reminder.
+At appointment time, both patient and doctor join a secure WebRTC video room from their respective dashboards.
+Doctor conducts the consultation, optionally referencing the patient's digital health record (with patient consent already granted at account level).
+Doctor issues a digital prescription within the platform, which is instantly saved to the patient's health record.
+Patient may proceed directly from the prescription to the medicine ordering flow (Section 4.1) with the prescription pre-attached.
+4.3 Flow: New User Onboarding
+User signs up via email/password or federated login (Firebase Authentication).
+User selects role context implicitly as "Patient" (default); Doctor/Admin roles are provisioned internally, not self-service, to prevent impersonation.
+User completes a basic health profile (age, known allergies, existing conditions) — optional but recommended, used only to improve AI assistant context and clinical relevance, never shared without consent.
+User lands on the dashboard showing quick actions: Ask AI Assistant, Book a Doctor, Order Medicine, View Health Records.
+4.4 Flow: Prescription Verification (Pharmacy Admin)
+Admin opens the verification queue, sorted by order age (oldest first).
+Admin views the uploaded prescription alongside the ordered medicine list.
+Admin approves, rejects with a reason, or requests re-upload.
+Patient is notified of the decision in-app and via email.
+
+5. Functional Requirements
+Each feature below is written as a set of testable requirements with an ID for traceability into test plans and sprint tickets.
+5.1 FR-1: AI Healthcare Assistant
+ID
+Requirement
+Priority
+FR-1.1
+System shall provide a chat interface accessible from any authenticated screen.
+Must
+FR-1.2
+Assistant shall answer questions about medicine usage, dosage guidance, precautions, and common side effects, sourced from a curated medicine knowledge base plus the Gemini 2.5 Flash API.
+Must
+FR-1.3
+Assistant shall append a visible disclaimer on any medicine or symptom-related response, stating it is not a substitute for professional medical advice.
+Must
+FR-1.4
+Assistant shall refuse to provide a diagnosis or a specific dosage recommendation for an individual's symptoms, and shall redirect the user to book a doctor consultation instead.
+Must
+FR-1.5
+Assistant shall be able to search the medicine catalog conversationally (e.g., "do you have something for acidity") and return matching catalog items.
+Should
+FR-1.6
+Assistant conversation history shall be stored per user for continuity across sessions.
+Should
+FR-1.7
+Flagged conversations (e.g., mentions of self-harm, overdose, emergency symptoms) shall trigger an immediate on-screen message directing the user to emergency services, and shall be logged for admin review.
+Must
+5.2 FR-2: Smart Medicine Ordering System
+ID
+Requirement
+Priority
+FR-2.1
+Users shall be able to search medicines by name, brand, generic composition, or condition/category.
+Must
+FR-2.2
+Each medicine listing shall display composition, usage, dosage form, price, stock status, and whether a prescription is required.
+Must
+FR-2.3
+System shall support add-to-cart, quantity adjustment, and checkout with order summary.
+Must
+FR-2.4
+System shall require prescription image/PDF upload before checkout completes for any Schedule H / prescription-only item.
+Must
+FR-2.5
+System shall support an order status lifecycle: Placed → Prescription Verification → Confirmed → Packed → Shipped → Delivered → (or Cancelled/Rejected).
+Must
+FR-2.6
+Users shall receive in-app and email notification on every order status change.
+Should
+FR-2.7
+AI assistant shall be able to suggest alternative/generic equivalents when a searched medicine is out of stock (informational only, confirmed by pharmacist before substitution).
+Could
+5.3 FR-3: Doctor Appointment Management
+ID
+Requirement
+Priority
+FR-3.1
+Users shall browse doctors filtered by specialization, availability date, and rating.
+Must
+FR-3.2
+Doctors shall define and update their available time slots via a calendar interface.
+Must
+FR-3.3
+Users shall book an available slot, producing a confirmed appointment record for both parties.
+Must
+FR-3.4
+Users shall be able to reschedule or cancel an appointment up to a configurable cutoff (e.g., 2 hours before start).
+Must
+FR-3.5
+System shall send an automated reminder notification at a configurable interval before the appointment (e.g., 24h and 1h prior).
+Should
+FR-3.6
+Double-booking of a single slot shall be prevented at the database/transaction level.
+Must
+5.4 FR-4: Telemedicine Services
+ID
+Requirement
+Priority
+FR-4.1
+System shall generate a unique, access-controlled video room per confirmed appointment using WebRTC.
+Must
+FR-4.2
+Only the assigned patient and doctor (and, optionally, an admin for support) shall be able to join a given room.
+Must
+FR-4.3
+Video sessions shall support basic controls: mute/unmute, camera on/off, end call.
+Must
+FR-4.4
+System shall not record video/audio by default; if recording is added later, explicit consent capture is required before activation.
+Must
+FR-4.5
+Doctor shall be able to generate a digital prescription from within the consultation screen, without leaving the call.
+Should
+FR-4.6
+System shall gracefully handle connection drops with a rejoin option preserving session state.
+Should
+5.5 FR-5: Digital Health Records
+ID
+Requirement
+Priority
+FR-5.1
+Every issued prescription shall be stored against the patient's record with doctor, date, medicines, and dosage instructions.
+Must
+FR-5.2
+Patients shall be able to view and download (PDF) any past prescription.
+Must
+FR-5.3
+Patients shall be able to view consultation history (doctor, date, specialization) and order history in one consolidated timeline.
+Should
+FR-5.4
+Access to a patient's health record shall be restricted to that patient and doctors they have an active/past appointment with.
+Must
+5.6 FR-6: Authentication & Role Management
+ID
+Requirement
+Priority
+FR-6.1
+System shall support signup/login via email-password and at least one federated provider (Google) through Firebase Authentication.
+Must
+FR-6.2
+System shall issue a JWT on successful login, used to authorize all subsequent API calls.
+Must
+FR-6.3
+System shall enforce role-based access control for four roles: Patient, Doctor, Pharmacy Admin, Platform Admin.
+Must
+FR-6.4
+Doctor and Admin accounts shall be provisioned only by an existing Platform Admin, not via public self-service signup.
+Must
+
+6. Non-Functional Requirements
+6.1 Performance
+Key screens (dashboard, catalog, doctor list) shall load within 2.5 seconds on a standard broadband connection.
+API response time for read endpoints (catalog search, doctor search) shall be under 500ms at p95 for the prototype's expected load (≤ 500 concurrent users).
+6.2 Scalability
+Backend shall be structured in modular layers (routes/controllers/services) so individual modules (pharmacy, appointments, AI, video) can later be split into separate services without a full rewrite.
+Database schema shall avoid unbounded array growth on a single document (e.g., a patient's orders are separate documents referencing the patient, not embedded in the patient document) to remain performant as data grows.
+6.3 Security & Privacy
+All traffic shall be served over HTTPS/TLS.
+Passwords shall never be stored in plaintext; Firebase Authentication or bcrypt-hashed credentials shall be used.
+Health records, prescriptions, and chat history are sensitive personal data — access shall be restricted by role and ownership at the API layer (not only hidden in the UI).
+Prescription files shall be stored in access-controlled cloud storage (e.g., Firebase Storage/AWS S3) with signed, time-limited URLs rather than public links.
+The platform shall aim to follow the data-protection spirit of applicable regulations (e.g., India's DPDP Act, and HIPAA-equivalent handling practices) even though full regulatory certification is out of scope for the prototype (see Section 2.2).
+6.4 Availability & Reliability
+Target uptime for the prototype/demo period: 99% (allows for maintenance windows during an internship timeline).
+Video consultation shall degrade gracefully (audio-only fallback) if bandwidth drops below the threshold needed for video.
+6.5 AI Safety & Responsible-AI Constraints
+The AI assistant shall never present its output as a diagnosis, a prescription, or a substitute for a licensed clinician.
+Every AI response touching medicine or symptoms shall carry a visible, non-dismissible-on-first-view disclaimer.
+The system shall maintain a moderation layer that intercepts queries indicating a medical emergency or self-harm risk and responds with emergency guidance rather than routing to the general-purpose model.
+AI assistant prompts and responses shall be logged (with user consent captured at signup) to support quality review and safety audits.
+6.6 Usability & Accessibility
+UI shall meet WCAG 2.1 AA color-contrast guidelines despite the light, premium visual theme (see design.md for the specific palette and contrast-checked combinations).
+Platform shall be fully responsive across desktop, tablet, and mobile browser widths.
+6.7 Maintainability
+Codebase shall follow a consistent module structure (feature-based folders) with documented API contracts (OpenAPI/Swagger recommended) to support handover after the internship period.
+
+7. System Architecture
+7.1 High-Level Architecture
+The system follows a modular monolith pattern for the backend — a single deployable Node.js/Express service internally organized into clearly separated modules (Auth, Pharmacy, Appointments, Telemedicine, AI Assistant, Health Records, Admin) — chosen over microservices given the team size and timeline constraints described in Section 2.4. Modules communicate through internal service functions and a shared MongoDB instance, with clear boundaries that would allow extraction into independent services in a later phase.
+7.2 Component Overview
+Client (React.js SPA): patient, doctor, and admin experiences served from one codebase with role-based routing/layout.
+API Gateway layer (Express.js): request validation, JWT verification, rate limiting, and routing to the appropriate module.
+Auth Module: wraps Firebase Authentication (or a JWT-issuing custom auth service) and issues session tokens consumed by the client.
+Pharmacy Module: catalog, cart, order lifecycle, prescription verification queue.
+Appointments Module: doctor availability, booking, rescheduling, reminders (via a scheduled job / cron worker).
+Telemedicine Module: WebRTC signaling server (Socket.io/WebSocket-based) that brokers peer connections between patient and doctor clients; media itself flows peer-to-peer (or via a TURN server when direct peer connection fails).
+AI Assistant Module: server-side proxy to the Gemini 2.5 Flash API, combined with a safety/moderation pre-filter and a retrieval step against the internal medicine knowledge base (RAG-style context injection) before calling the model.
+Health Records Module: read/write access to prescriptions, consultation summaries, and order history, enforcing ownership-based access control.
+Admin Module: doctor onboarding, inventory management, AI-flag review dashboard.
+Database (MongoDB): primary data store — see Section 8 for schema.
+Cloud Storage (Firebase Storage / AWS S3): prescription images/PDFs, profile photos, generated prescription PDFs.
+Notification Service: email (e.g., via SendGrid/Nodemailer) and optional SMS provider integration for order/appointment alerts.
+7.3 AI Assistant Request Flow
+Client sends the user's message to POST /api/ai/chat with the JWT.
+Server runs a safety pre-filter (keyword + lightweight classifier) to detect emergency/self-harm signals.
+If safe, server retrieves relevant context from the internal medicine knowledge base (catalog + curated medical reference data) matching the query.
+Server calls the Gemini 2.5 Flash API with a system prompt enforcing the informational-only, non-diagnostic constraint plus the retrieved context.
+Server appends the mandatory disclaimer, logs the exchange, and returns the response to the client.
+7.4 Deployment View
+Frontend: static build deployed via Firebase Hosting or an AWS S3 + CloudFront distribution.
+Backend: containerized Node.js service deployed on a managed platform (e.g., AWS Elastic Beanstalk/ECS, or Render/Railway for a faster internship-friendly setup).
+Database: MongoDB Atlas (managed) to avoid self-hosting operational overhead.
+TURN/STUN: a managed TURN service (e.g., Twilio STUN/TURN or coturn on a small VM) to support WebRTC connections across restrictive NATs.
+
+8. Data Model
+Note: The project schema file referenced in the request was not attached to this document at time of writing. The collections below represent a proposed MongoDB schema derived directly from the functional requirements in Section 5, and are structured so they can be directly replaced or reconciled with the team's actual schema once shared — field names and relationships follow common Mongoose/MongoDB conventions to minimize rework.
+
+8.1 User (base collection for Patient / Doctor / Admin via role field)
+Field
+Type
+Notes
+_id
+ObjectId
+Primary key
+name
+String
+Required
+email
+String
+Required, unique
+passwordHash / firebaseUid
+String
+Depending on auth provider used
+role
+Enum
+patient | doctor | pharmacy_admin | platform_admin
+phone
+String
+
+profileImageUrl
+String
+Cloud storage reference
+healthProfile
+Object
+age, allergies[], conditions[] — patient only, optional
+specialization
+String
+Doctor only
+licenseNumber
+String
+Doctor only, verified by admin
+isVerified
+Boolean
+Doctor only, set by platform admin
+createdAt / updatedAt
+Date
+Timestamps
+8.2 Medicine
+Field
+Type
+Notes
+_id
+ObjectId
+Primary key
+name
+String
+Brand name
+genericName
+String
+Salt/composition
+category
+String
+e.g., Pain Relief, Antibiotics
+description
+String
+Usage summary
+dosageForm
+String
+Tablet, Syrup, Injection, etc.
+price
+Number
+
+stockQuantity
+Number
+
+prescriptionRequired
+Boolean
+Drives FR-2.4 checkout gating
+sideEffects
+String[]
+
+precautions
+String[]
+
+imageUrl
+String
+
+8.3 Order
+Field
+Type
+Notes
+_id
+ObjectId
+Primary key
+patientId
+ObjectId (ref: User)
+Indexed
+items
+Array<{medicineId, qty, priceAtOrder}>
+
+prescriptionFileUrl
+String
+Required if any item.prescriptionRequired
+status
+Enum
+placed | pending_verification | confirmed | packed | shipped | delivered | rejected | cancelled
+totalAmount
+Number
+
+verifiedBy
+ObjectId (ref: User, pharmacy_admin)
+Nullable
+createdAt / updatedAt
+Date
+Timestamps
+8.4 Appointment
+Field
+Type
+Notes
+_id
+ObjectId
+Primary key
+patientId
+ObjectId (ref: User)
+Indexed
+doctorId
+ObjectId (ref: User)
+Indexed
+slotStart / slotEnd
+Date
+Unique constraint with doctorId to prevent double-booking
+status
+Enum
+scheduled | rescheduled | cancelled | completed | no_show
+videoRoomId
+String
+Generated on confirmation
+reminderSentAt
+Date[]
+Tracks which reminders fired
+createdAt / updatedAt
+Date
+Timestamps
+8.5 Prescription
+Field
+Type
+Notes
+_id
+ObjectId
+Primary key
+appointmentId
+ObjectId (ref: Appointment)
+Nullable if uploaded independently
+patientId
+ObjectId (ref: User)
+Indexed
+doctorId
+ObjectId (ref: User)
+Nullable if patient-uploaded, not doctor-issued
+medicines
+Array<{name, dosage, duration, instructions}>
+Doctor-issued only
+fileUrl
+String
+Signed URL to stored PDF/image
+source
+Enum
+doctor_issued | patient_uploaded
+createdAt
+Date
+
+8.6 ChatConversation (AI Assistant)
+Field
+Type
+Notes
+_id
+ObjectId
+Primary key
+patientId
+ObjectId (ref: User)
+Indexed
+messages
+Array<{role, content, timestamp}>
+role: user | assistant
+flagged
+Boolean
+True if safety pre-filter triggered
+flagReason
+String
+Nullable
+createdAt / updatedAt
+Date
+Timestamps
+8.7 Entity Relationship Summary
+User (patient) 1—N Order
+User (patient) 1—N Appointment N—1 User (doctor)
+Appointment 1—1 Prescription (optional, when doctor-issued during a consult)
+User (patient) 1—N Prescription (both doctor-issued and self-uploaded)
+User (patient) 1—N ChatConversation
+Order N—1 Medicine (via items array, many-to-many resolved through the items sub-document)
+
+9. API Surface (Representative Endpoints)
+The following is a representative, non-exhaustive REST contract sufficient to plan sprint work. Full OpenAPI documentation should be maintained alongside implementation.
+9.1 Auth
+POST /api/auth/signup — create a patient account
+POST /api/auth/login — authenticate, returns JWT
+POST /api/auth/refresh — refresh token
+9.2 Pharmacy
+GET /api/medicines?query=&category= — search catalog
+GET /api/medicines/:id — medicine detail
+POST /api/orders — create order (with optional prescription file reference)
+GET /api/orders/:id — order status/detail
+PATCH /api/orders/:id/status — admin-only status transition
+9.3 Appointments
+GET /api/doctors?specialization=&date= — search doctors and availability
+POST /api/appointments — book a slot
+PATCH /api/appointments/:id — reschedule/cancel
+9.4 Telemedicine
+GET /api/appointments/:id/room-token — issue a signed room-join token
+WS /signaling — WebRTC offer/answer/ICE-candidate exchange channel
+9.5 AI Assistant
+POST /api/ai/chat — send a message, receive assistant response (safety-filtered)
+GET /api/ai/conversations/:id — retrieve conversation history
+9.6 Health Records
+GET /api/patients/:id/prescriptions — list prescriptions (ownership-checked)
+GET /api/patients/:id/history — consolidated consultation + order timeline
+
+10. UI/UX Requirements Summary
+Full visual direction, screen-by-screen layout guidance, and the exact prompt structure for generating high-fidelity mockups in Google Stitch are provided in the companion design.md file. This section captures the product-level UI requirements the design must satisfy.
+Overall theme: light, clean, premium/clinical-trustworthy aesthetic — not a playful consumer app look. Ample white space, soft shadows, rounded but restrained corner radii.
+Primary navigation must expose four destinations at all times for a logged-in patient: AI Assistant, Pharmacy, Doctors/Appointments, Health Records.
+The AI Assistant must be reachable from a persistent floating action button on every screen, not only its own page.
+Prescription-required medicines must show a clear visual badge (e.g., an "Rx" tag) distinct from over-the-counter items.
+Order status and appointment status must use a consistent stepper/timeline visual pattern across the platform.
+Doctor video consultation screen must be a distraction-free, full-focus layout with call controls always visible.
+All disclaimers (AI assistant, prescription requirement) must be visually distinct (e.g., a tinted info banner) but not alarming red/error styling, to avoid appearing as an error state.
+
+11. Risks, Dependencies & Mitigations
+Risk
+Impact
+Mitigation
+AI assistant gives medically unsafe or overconfident guidance
+High
+Mandatory disclaimers, safety pre-filter, explicit prompt constraints, no diagnosis/dosage claims (Section 6.5)
+Regulatory exposure from selling prescription medicines online without licensing
+High
+Scope explicitly excludes real regulatory launch (Section 2.2); prototype uses mock fulfillment and clearly labels itself as a demonstrator
+WebRTC connectivity failures behind restrictive NATs/firewalls
+Medium
+TURN server fallback; audio-only degradation path (FR-4.6, Section 6.4)
+Prescription image quality too poor for admin verification
+Medium
+Client-side image quality check before upload; re-upload request flow (Section 4.4)
+Third-party API (Gemini) rate limits or downtime
+Medium
+Server-side caching of common medicine-info queries; graceful fallback message when API unavailable
+Double-booking race condition on popular doctor slots
+Medium
+Unique compound index on (doctorId, slotStart) at the database level (FR-3.6)
+Small student team unable to cover full scope in internship timeline
+Medium
+Phased milestone plan (Section 12) with a clearly defined MVP cut line
+
+12. Delivery Milestones
+Phase
+Duration
+Deliverables
+Phase 1 — Foundation
+Weeks 1-2
+Auth (JWT/Firebase), base React app shell, MongoDB schema implementation, CI/CD skeleton
+Phase 2 — Pharmacy Module
+Weeks 3-4
+Catalog, search, cart, checkout, prescription upload, order status lifecycle
+Phase 3 — Appointments Module
+Weeks 5-6
+Doctor directory, availability calendar, booking/reschedule/cancel, reminder jobs
+Phase 4 — AI Assistant
+Weeks 6-7
+Gemini 2.5 Flash integration, safety pre-filter, medicine knowledge-base retrieval, disclaimers
+Phase 5 — Telemedicine
+Weeks 8-9
+WebRTC signaling server, video room UI, in-call digital prescription issuance
+Phase 6 — Health Records & Admin
+Week 10
+Consolidated patient timeline, pharmacy admin verification queue, platform admin dashboard
+Phase 7 — Hardening & Demo Prep
+Weeks 11-12
+Cross-browser/responsive QA, security review, performance pass, IEEE demo rehearsal
+
+13. Acceptance Criteria for MVP Sign-Off
+A patient can register, ask the AI assistant a medicine question, and receive a disclaimer-qualified answer.
+A patient can search a medicine, add it to cart, upload a prescription, and see the order reach "Confirmed" status after admin approval.
+A patient can find a doctor, book a slot, and both patient and doctor can join a working video call at the scheduled time.
+A doctor can issue a digital prescription during/after a consultation, and it appears immediately in the patient's health record.
+All role-restricted data (another patient's prescriptions, another doctor's schedule) is verifiably inaccessible when tested with a different account's token.
+No blocking (P0) defects are open at demo time.
+
+14. Conclusion
+This PRD translates the Smart Pharmacy and Telemedicine Platform concept into a buildable specification: a modular monolith backend, a MongoDB data model that supports the pharmacy, appointment, telemedicine, and AI assistant flows, and a phased delivery plan sized for an internship timeline. The single most important constraint threaded through every section is safety: the AI assistant is explicitly scoped as an informational aid, never a diagnostic authority, with disclaimers and a moderation layer enforced at the architecture level rather than left to prompt wording alone.
+The companion design.md document translates the UI requirements in Section 10 into a concrete, premium, light-themed visual system and a ready-to-use Google Stitch generation prompt, so that engineering and design work can proceed in parallel from this same specification.
+Once the team's actual database schema is available, Section 8 should be reconciled against it — the structure above is intentionally written in standard MongoDB/Mongoose conventions to make that reconciliation a direct field-mapping exercise rather than a redesign.
