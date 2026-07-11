@@ -6,7 +6,6 @@ export default function LeftAccentCard({ accentColor, children, className = '', 
   return (
     <div 
       className={`left-accent-card ${className}`} 
-      style={cardStyle}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       style={{ ...cardStyle, cursor: onClick ? 'pointer' : 'default' }}

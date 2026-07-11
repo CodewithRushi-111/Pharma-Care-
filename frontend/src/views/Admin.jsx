@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import LeftAccentCard from '../components/LeftAccentCard';
-import PrescriptionBadge from '../components/PrescriptionBadge';
-import { Check, X, RefreshCw, FileText, AlertTriangle, User, Calendar, Clock, Plus, ShieldAlert, ShoppingBag } from 'lucide-react';
+import { Check, X, FileText, AlertTriangle, Plus, ShieldAlert, ShoppingBag } from 'lucide-react';
 
 export default function Admin({ 
   adminOrders = [], 

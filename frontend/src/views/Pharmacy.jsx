@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PrescriptionBadge from '../components/PrescriptionBadge';
 import LeftAccentCard from '../components/LeftAccentCard';
 import InfoDisclaimer from '../components/InfoDisclaimer';
-import { Search, ShoppingCart, UploadCloud, Check, FileText, ArrowRight, X, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Search, ShoppingCart, UploadCloud, Check, FileText, X } from 'lucide-react';
 
 export default function Pharmacy({ cart, addToCart, removeFromCart, updateCartQuantity, clearCart, checkoutOrders, medicinesList = [] }) {
   const navigate = useNavigate();

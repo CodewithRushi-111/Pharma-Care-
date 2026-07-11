@@ -262,6 +262,7 @@ function AppContent() {
                 updateCartQuantity={updateCartQuantity} 
                 clearCart={clearCart}
                 checkoutOrders={checkoutOrders}
+                medicinesList={medicinesList}
               />
             } />
             <Route path="/orders" element={

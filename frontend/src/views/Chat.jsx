@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import InfoDisclaimer from '../components/InfoDisclaimer';
 import PrescriptionBadge from '../components/PrescriptionBadge';
-import { Send, Mic, Sparkles, Plus, AlertCircle, ShoppingCart, ShieldAlert } from 'lucide-react';
+import { Send, Mic, Sparkles, ShoppingCart, ShieldAlert } from 'lucide-react';
 
 export default function Chat({ addToCart, onSafetyFlagged }) {
   const location = useLocation();
@@ -24,6 +24,7 @@ export default function Chat({ addToCart, onSafetyFlagged }) {
       // Clear state so it doesn't trigger again on refresh
       location.state.initialQuery = null;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
   useEffect(() => {

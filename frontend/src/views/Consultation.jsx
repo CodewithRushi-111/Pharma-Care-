@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Clipboard, Plus, Check } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Clipboard, Plus } from 'lucide-react';
 
 export default function Consultation({ selectedDoctor, addPrescription }) {
   const navigate = useNavigate();

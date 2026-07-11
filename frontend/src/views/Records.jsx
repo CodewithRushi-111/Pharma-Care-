@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import LeftAccentCard from '../components/LeftAccentCard';
-import { Calendar, Filter, Eye, ChevronDown, ChevronUp, FileText, CheckCircle2 } from 'lucide-react';
+import { Filter, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 
 export default function Records() {
   const [expandedIndex, setExpandedIndex] = useState(0);

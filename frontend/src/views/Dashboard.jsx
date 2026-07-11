@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LeftAccentCard from '../components/LeftAccentCard';
 import StatusStepper from '../components/StatusStepper';
-import { Sparkles, Calendar, Clipboard, ArrowRight, Activity, FileText, ShoppingBag, X, Clock, Edit2 } from 'lucide-react';
+import { Sparkles, Calendar, ArrowRight, Activity, FileText, ShoppingBag, X, Edit2 } from 'lucide-react';
 
-export default function Dashboard({ cart, orders = [], appointments = [], setSelectedDoctor, rescheduleAppointment, cancelAppointment }) {
+export default function Dashboard({ _cart, orders = [], appointments = [], setSelectedDoctor, rescheduleAppointment, cancelAppointment }) {
   const navigate = useNavigate();
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [selectedAptId, setSelectedAptId] = useState(null);

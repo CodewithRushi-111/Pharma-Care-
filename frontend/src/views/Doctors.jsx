@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import LeftAccentCard from '../components/LeftAccentCard';
-import { Search, Calendar, Clock, Star, Video, Check } from 'lucide-react';
+import { Search, Clock, Star, Check } from 'lucide-react';
 
 export default function Doctors({ addAppointment, doctorsList = [] }) {
   const [searchQuery, setSearchQuery] = useState('');

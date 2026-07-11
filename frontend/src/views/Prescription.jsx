@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Download, Check, ShoppingBag } from 'lucide-react';
+import { Download, Check, ShoppingBag } from 'lucide-react';
 
 export default function Prescription({ prescriptions = [], addCartItems }) {
   const navigate = useNavigate();

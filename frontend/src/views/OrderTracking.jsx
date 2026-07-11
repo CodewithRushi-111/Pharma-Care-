@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import StatusStepper from '../components/StatusStepper';
 import LeftAccentCard from '../components/LeftAccentCard';
-import { ShoppingBag, Calendar, MapPin, AlertTriangle } from 'lucide-react';
+import { Calendar, MapPin, AlertTriangle } from 'lucide-react';
 
 export default function OrderTracking({ orders = [] }) {
   const [selectedOrderIndex, setSelectedOrderIndex] = useState(0);
