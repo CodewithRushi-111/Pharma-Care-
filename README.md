@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="frontend/public/logo.png" alt="Pharma Care Logo" width="150" />
+</div>
+
 # Pharma Care - AI-Powered Smart Pharmacy & Telemedicine Platform
 
 Welcome to the **Pharma Care Platform**, a unified digital ecosystem designed for medicine access, doctor consultation, and AI-guided healthcare. This project was developed as part of the IEEE Internship Program to showcase a modern, responsive, and robust full-stack web application.
