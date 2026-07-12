@@ -30,7 +30,9 @@ export default function OrderTracking({ orders = [] }) {
     }
   ];
 
-  const activeOrders = orders.length > 0 ? [...orders, ...defaultOrders] : defaultOrders;
+  const activeOrders = orders.length > 0 
+    ? [...orders, ...defaultOrders.filter(d => !orders.some(o => o.id === d.id))] 
+    : defaultOrders;
   const currentOrder = activeOrders[selectedOrderIndex] || activeOrders[0];
 
   const stepperStages = ['Placed', 'Verification', 'Confirmed', 'Shipped', 'Delivered'];
@@ -45,7 +47,7 @@ export default function OrderTracking({ orders = [] }) {
           <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', marginBottom: '8px' }}>Your Orders</h3>
           {activeOrders.map((ord, idx) => (
             <div 
-              key={ord.id} 
+              key={`${ord.id}-${idx}`} 
               className={`left-accent-card ${selectedOrderIndex === idx ? 'active' : ''}`}
               style={{
                 '--accent-color': selectedOrderIndex === idx ? 'var(--color-primary)' : 'var(--color-border)',
