@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PharmaCare | Healthcare, Reimagined with AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;500&amp;family=Geist:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#d0e8df",
+                    "surface-container-lowest": "#00110d",
+                    "on-secondary-fixed-variant": "#005140",
+                    "on-secondary": "#00382b",
+                    "secondary-container": "#00e9bd",
+                    "inverse-on-surface": "#20342f",
+                    "error": "#ffb4ab",
+                    "outline": "#84958a",
+                    "surface-container-low": "#0a1f1a",
+                    "on-tertiary": "#17362d",
+                    "surface": "#031712",
+                    "on-secondary-fixed": "#002018",
+                    "surface-dim": "#031712",
+                    "surface-bright": "#293d37",
+                    "on-primary-fixed": "#002114",
+                    "surface-tint": "#00e2a1",
+                    "on-secondary-container": "#006450",
+                    "inverse-primary": "#006c4b",
+                    "secondary-fixed": "#3bfed0",
+                    "on-primary-container": "#006344",
+                    "on-surface-variant": "#bacbbf",
+                    "on-tertiary-fixed-variant": "#2f4c43",
+                    "primary": "#89ffca",
+                    "outline-variant": "#3b4a42",
+                    "on-error-container": "#ffdad6",
+                    "on-primary": "#003825",
+                    "surface-container": "#0f231e",
+                    "primary-fixed-dim": "#00e2a1",
+                    "surface-container-high": "#192e28",
+                    "surface-variant": "#243933",
+                    "on-background": "#d0e8df",
+                    "secondary": "#93ffde",
+                    "on-primary-fixed-variant": "#005138",
+                    "error-container": "#93000a",
+                    "on-error": "#690005",
+                    "background": "#031712",
+                    "on-tertiary-container": "#3e5d53",
+                    "on-tertiary-fixed": "#012019",
+                    "tertiary-fixed": "#c8eadd",
+                    "surface-container-highest": "#243933",
+                    "on-surface": "#d0e8df",
+                    "primary-fixed": "#44ffbb",
+                    "tertiary-fixed-dim": "#adcec2",
+                    "tertiary": "#cff0e4",
+                    "secondary-fixed-dim": "#00e0b5",
+                    "primary-container": "#14e8a6",
+                    "tertiary-container": "#b3d4c8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "label-sm": ["Geist"],
+                    "headline-xl": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-xl": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        } 50% {
+        transform: translateY(-20px) rotate(2deg);
+        }
+    }
+@keyframes pulse-slow {
+    0%, 100% {
+        opacity: 0.4;
+        } 50% {
+        opacity: 0.8;
+        }
+    }
+@keyframes orbit {
+    from {
+        transform: rotate(0deg) translateX(100px) rotate(0deg);
+        } to {
+        transform: rotate(360deg) translateX(100px) rotate(-360deg);
+        }
+    }
+.perspective-1000 {
+    perspective: 1000px
+    }
+.preserve-3d {
+    transform-style: preserve-3d
+    }
+.glass-card {
+    background: rgba(14, 45, 37, 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 32px 64px -15px rgba(3, 12, 10, 0.4)
+    }
+.aurora-bg {
+    background: radial-gradient(circle at 20% 30%, #0E2D25 0%, transparent 50%), radial-gradient(circle at 80% 70%, #071C17 0%, transparent 50%), #031712
+    }
+.magnetic-btn {
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)
+    }
+.noise {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBCxrgUIQZ2fjDTJYE4eF212R1ov7m_Lp86HnDv-RerZqMfVLXdcIJ6Azizf9EFh_pzyzYirJlQVgplZUgtDOL93rK1ih0N3gPfCgrB-QtPA1gjjUx3Gigh30rJHie1ft3TvVowy9DTfSKYQSsQtrxVHZF1yHvmQQZDFWNGZpceTM2Tydplgf_26jSMPEEIu7rZmCaAteY41lZKyvzFDmMegx_AcxXzEEoy1DhVtlyTChrIjg1IkGXRRJp1FIZYnhPNlSknxSMd24c);
+    filter: contrast(150%) brightness(1000%);
+    opacity: 0.05
+    }
+.animate-float {
+    animation: float 6s ease-in-out infinite
+    }
+.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }</style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary/30 antialiased overflow-x-hidden">
+<div class="fixed inset-0 aurora-bg -z-20"></div>
+<div class="fixed inset-0 noise pointer-events-none -z-10"></div>
+<!-- Navigation Shell -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop py-4 bg-surface/60 backdrop-blur-xl border-b border-white/10">
+<div class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+            PharmaCare
+        </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-label-sm text-label-sm text-primary border-b-2 border-primary pb-1" href="#">Features</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">How it Works</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Telemedicine</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Pharmacy</a>
+</nav>
+<button class="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-full font-label-sm text-label-sm font-bold hover:scale-95 transition-transform">
+            Get Started
+        </button>
+</header>
+<main class="relative">
+<!-- Section 1: Hero -->
+<section class="min-h-screen flex items-center pt-32 pb-16 px-margin-desktop overflow-hidden">
+<div class="grid lg:grid-cols-2 gap-16 items-center w-full max-w-container-max mx-auto">
+<div class="z-10">
+<div class="inline-flex items-center gap-2 px-3 py-1 glass-card rounded-full mb-8">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Next-Gen Health Intelligence</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl mb-8 leading-tight">
+                        Healthcare, <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Reimagined</span> with AI.
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-xl">
+                        Experience the fusion of clinical precision and high-end technology. Your health journey managed by advanced neural diagnostics and 24/7 smart care.
+                    </p>
+<div class="flex flex-wrap gap-6">
+<button class="magnetic-btn bg-gradient-to-r from-primary-container to-secondary-container text-on-primary-container px-10 py-5 rounded-xl font-headline-md text-headline-md flex items-center gap-3 group shadow-lg shadow-primary/20">
+                            Get Started
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<button class="glass-card text-on-surface px-10 py-5 rounded-xl font-headline-md text-headline-md flex items-center gap-3 hover:bg-white/5 transition-all">
+                            View Demo
+                            <span class="material-symbols-outlined">play_circle</span>
+</button>
+</div>
+</div>
+<!-- 3D Engine Container -->
+<div class="relative perspective-1000 h-[600px] hidden lg:block" id="hero-engine">
+<div class="absolute inset-0 flex items-center justify-center preserve-3d" id="parallax-engine">
+<!-- Central AI Node -->
+<div class="w-64 h-64 glass-card rounded-full flex items-center justify-center animate-float relative">
+
+<span class="material-symbols-outlined text-8xl text-primary drop-shadow-[0_0_20px_rgba(137,255,202,0.5)]" style="font-variation-settings: 'FILL' 1;">neurology</span>
+</div>
+<!-- Orbiting Elements -->
+<div class="absolute w-full h-full preserve-3d animate-[spin_20s_linear_infinite]">
+<div class="absolute top-1/4 left-0 glass-card p-4 rounded-2xl -rotate-12 transform-gpu">
+<span class="material-symbols-outlined text-primary mb-2">dns</span>
+<div class="h-1 w-12 bg-primary/20 rounded-full"></div>
+</div>
+<div class="absolute bottom-1/4 right-0 glass-card p-4 rounded-2xl rotate-12 transform-gpu">
+<span class="material-symbols-outlined text-secondary mb-2">ecg_heart</span>
+<div class="h-1 w-12 bg-secondary/20 rounded-full"></div>
+</div>
+<div class="absolute top-10 right-1/4 glass-card p-4 rounded-2xl rotate-45 transform-gpu">
+<span class="material-symbols-outlined text-on-surface mb-2">pill</span>
+<div class="h-1 w-12 bg-white/10 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Features -->
+<section class="py-32 px-margin-desktop bg-surface-container-low/30">
+<div class="max-w-container-max mx-auto">
+<div class="mb-24 text-center">
+<h2 class="font-headline-lg text-headline-lg mb-4">Precision Engineering for Life</h2>
+<p class="text-on-surface-variant font-body-lg">Every touchpoint optimized for clinical accuracy and digital speed.</p>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Feature Card 1 -->
+<div class="glass-card p-10 rounded-3xl group hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-500">
+<span class="material-symbols-outlined text-4xl">psychology</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">AI Diagnostic Assistant</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">Our neural networks analyze symptoms with 99.4% correlation to board-certified specialists.</p>
+<a class="text-primary font-label-sm text-label-sm flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Learn more <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+<!-- Feature Card 2 -->
+<div class="glass-card p-10 rounded-3xl group hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-8 group-hover:bg-secondary group-hover:text-on-secondary transition-colors duration-500">
+<span class="material-symbols-outlined text-4xl">video_chat</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">Instant Telemedicine</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">Connect with global experts in under 60 seconds through 8K low-latency video streaming.</p>
+<a class="text-primary font-label-sm text-label-sm flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Learn more <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+<!-- Feature Card 3 -->
+<div class="glass-card p-10 rounded-3xl group hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-on-surface-variant/10 flex items-center justify-center mb-8 group-hover:bg-on-surface-variant group-hover:text-surface transition-colors duration-500">
+<span class="material-symbols-outlined text-4xl">robot_2</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">Smart Pharmacy</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">Autonomous prescription fulfillment and same-day biometric drone delivery services.</p>
+<a class="text-primary font-label-sm text-label-sm flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Learn more <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+<!-- Additional Features in similar pattern -->
+<div class="glass-card p-10 rounded-3xl group hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-4xl">monitoring</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">Continuous Monitoring</h3>
+<p class="text-on-surface-variant leading-relaxed">Passive health tracking through wearable integration and AI trend prediction.</p>
+</div>
+<div class="glass-card p-10 rounded-3xl group hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-8 group-hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined text-4xl">lock</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">Privacy First</h3>
+<p class="text-on-surface-variant leading-relaxed">Zero-knowledge proof encryption ensures your medical data belongs only to you.</p>
+</div>
+<div class="glass-card p-10 rounded-3xl group hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+<div class="w-16 h-16 rounded-2xl bg-on-surface-variant/10 flex items-center justify-center mb-8 group-hover:bg-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-4xl">clinical_notes</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">Global Network</h3>
+<p class="text-on-surface-variant leading-relaxed">Unified health records accessible across 140+ countries and 5,000+ facilities.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: How AI Works (Timeline) -->
+<section class="py-32 px-margin-desktop relative overflow-hidden">
+<div class="max-w-container-max mx-auto relative z-10">
+<h2 class="font-headline-lg text-headline-lg mb-20 text-center">Neural Workflow Pipeline</h2>
+<div class="relative flex flex-col md:flex-row justify-between items-start gap-8">
+<!-- Connector Line (Desktop) -->
+<div class="hidden md:block absolute top-12 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+<!-- Step 1 -->
+<div class="relative flex-1 text-center group">
+<div class="w-24 h-24 rounded-full glass-card mx-auto mb-8 flex items-center justify-center relative z-20 group-hover:scale-110 transition-transform bg-surface">
+<span class="material-symbols-outlined text-4xl text-primary">symptoms</span>
+<div class="absolute -inset-2 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Input</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Symptom capture</p>
+</div>
+<!-- Step 2 -->
+<div class="relative flex-1 text-center group">
+<div class="w-24 h-24 rounded-full glass-card mx-auto mb-8 flex items-center justify-center relative z-20 group-hover:scale-110 transition-transform bg-surface">
+<span class="material-symbols-outlined text-4xl text-primary">analytics</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Analysis</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">AI Diagnosis</p>
+</div>
+<!-- Step 3 -->
+<div class="relative flex-1 text-center group">
+<div class="w-24 h-24 rounded-full glass-card mx-auto mb-8 flex items-center justify-center relative z-20 group-hover:scale-110 transition-transform bg-surface">
+<span class="material-symbols-outlined text-4xl text-primary">rate_review</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Review</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">MD Verification</p>
+</div>
+<!-- Step 4 -->
+<div class="relative flex-1 text-center group">
+<div class="w-24 h-24 rounded-full glass-card mx-auto mb-8 flex items-center justify-center relative z-20 group-hover:scale-110 transition-transform bg-surface">
+<span class="material-symbols-outlined text-4xl text-primary">prescriptions</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Script</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Digital Order</p>
+</div>
+<!-- Step 5 -->
+<div class="relative flex-1 text-center group">
+<div class="w-24 h-24 rounded-full glass-card mx-auto mb-8 flex items-center justify-center relative z-20 group-hover:scale-110 transition-transform bg-surface">
+<span class="material-symbols-outlined text-4xl text-primary">local_shipping</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Delivery</h4>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Same-day arrival</p>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 -z-10">
+
+</div>
+</section>
+<!-- Section 4: Telemedicine (Bento Style) -->
+<section class="py-32 px-margin-desktop bg-surface-container">
+<div class="max-w-container-max mx-auto grid lg:grid-cols-12 gap-gutter items-center">
+<div class="lg:col-span-5">
+<h2 class="font-headline-lg text-headline-lg mb-8">Virtual Care. <br/>Real Connection.</h2>
+<p class="text-on-surface-variant font-body-lg mb-12">Skip the waiting room. Our network of elite specialists is available instantly on any device.</p>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
+<span class="font-body-md text-body-md">Board-Certified Globally</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
+<span class="font-body-md text-body-md">24/7 Priority Access</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">check_circle</span>
+<span class="font-body-md text-body-md">Multilingual Support (40+ Languages)</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-7 grid grid-cols-2 gap-6 perspective-1000">
+<!-- Specialist Card 1 -->
+<div class="glass-card p-6 rounded-3xl transform rotate-y-6 hover:rotate-y-0 transition-transform duration-700">
+<div class="w-full aspect-[4/5] rounded-2xl overflow-hidden mb-6 relative">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a senior female cardiologist with a kind smile, set against a high-tech clinical background with glowing emerald medical data displays. The lighting is soft and cinematic, highlighting the professional attire and medical equipment. The overall aesthetic is clean, futuristic, and reassuring." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoFbDWjV8vyJol3NuaccoD35Z2EJheOHgjS3Vhcyj9RoP6xf8lsivd1GUNz4IwRgNFFvB2Ro0Rq5gR2cRzE4tfLGpqBlMDpTNDZwilndSX5kiO0S2HPBDz17Wse-Gb83lbl6hxYuUfwTmnrp-xIuVV5peOC_T8rB3Y_b9PKDDg_9LEs3OxSgtaeZrebFFEEd0yt0E_bWkePq0Ip_nQB-Qk693MJf2mdwyQPqZ84n3CDP2gyEhRrXedKWBeZolFjFjKFCdWCFj6wxU"/>
+<div class="absolute top-4 left-4 bg-primary text-on-primary font-label-sm text-label-sm px-3 py-1 rounded-full">LIVE NOW</div>
+</div>
+<h5 class="font-headline-md text-headline-md">Dr. Elena Volkov</h5>
+<p class="text-primary font-label-sm text-label-sm">Senior Cardiologist</p>
+</div>
+<!-- Calendar Booking Card -->
+<div class="glass-card p-8 rounded-3xl transform -translate-y-12">
+<div class="flex items-center justify-between mb-8">
+<h5 class="font-headline-md text-headline-md">Schedule</h5>
+<span class="material-symbols-outlined text-primary">calendar_month</span>
+</div>
+<div class="grid grid-cols-7 gap-2 mb-8">
+<div class="text-center font-label-sm text-label-sm opacity-50">S</div>
+<div class="text-center font-label-sm text-label-sm opacity-50">M</div>
+<div class="text-center font-label-sm text-label-sm opacity-50">T</div>
+<div class="text-center font-label-sm text-label-sm opacity-50">W</div>
+<div class="text-center font-label-sm text-label-sm opacity-50">T</div>
+<div class="text-center font-label-sm text-label-sm opacity-50">F</div>
+<div class="text-center font-label-sm text-label-sm opacity-50">S</div>
+<div class="h-10 flex items-center justify-center font-label-sm text-label-sm hover:bg-primary/20 rounded-lg cursor-pointer">12</div>
+<div class="h-10 flex items-center justify-center font-label-sm text-label-sm hover:bg-primary/20 rounded-lg cursor-pointer">13</div>
+<div class="h-10 flex items-center justify-center font-label-sm text-label-sm bg-primary text-on-primary rounded-lg cursor-pointer">14</div>
+<div class="h-10 flex items-center justify-center font-label-sm text-label-sm hover:bg-primary/20 rounded-lg cursor-pointer">15</div>
+<div class="h-10 flex items-center justify-center font-label-sm text-label-sm hover:bg-primary/20 rounded-lg cursor-pointer">16</div>
+<div class="h-10 flex items-center justify-center font-label-sm text-label-sm hover:bg-primary/20 rounded-lg cursor-pointer">17</div>
+<div class="h-10 flex items-center justify-center font-label-sm text-label-sm hover:bg-primary/20 rounded-lg cursor-pointer">18</div>
+</div>
+<button class="w-full py-4 bg-white/5 rounded-xl border border-white/10 font-label-sm text-label-sm hover:bg-white/10 transition-all">Book Consultation</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Smart Pharmacy (3D Medicine Shelf) -->
+<section class="py-32 px-margin-desktop">
+<div class="max-w-container-max mx-auto">
+<div class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg mb-4">Precision Fulfillment</h2>
+<p class="text-on-surface-variant font-body-lg">Pharmaceutical logistics, automated by AI.</p>
+</div>
+<button class="text-primary font-headline-md text-headline-md flex items-center gap-2">Browse All <span class="material-symbols-outlined">arrow_right_alt</span></button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<!-- Med Card 1 -->
+<div class="glass-card rounded-3xl overflow-hidden group">
+<div class="h-48 relative bg-surface-container-highest/50 flex items-center justify-center perspective-1000">
+<div class="w-24 h-24 bg-gradient-to-br from-primary/40 to-secondary/20 rounded-xl transform-gpu rotate-x-12 rotate-y-12 group-hover:rotate-x-45 group-hover:rotate-y-45 transition-transform duration-700 shadow-2xl"></div>
+<span class="absolute material-symbols-outlined text-4xl text-white/50 group-hover:text-primary transition-colors">medical_information</span>
+</div>
+<div class="p-6">
+<h6 class="font-headline-md text-headline-md mb-1">Neuro-Boost</h6>
+<p class="text-on-surface-variant font-label-sm text-label-sm mb-4">Focus &amp; Clarity Complex</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-primary">$49.00</span>
+<div class="flex items-center gap-1 text-on-surface-variant text-[10px] uppercase font-bold">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Stock: 14
+                                </div>
+</div>
+</div>
+</div>
+<!-- Med Card 2 -->
+<div class="glass-card rounded-3xl overflow-hidden group mt-12">
+<div class="h-48 relative bg-surface-container-highest/50 flex items-center justify-center perspective-1000">
+<div class="w-24 h-24 bg-gradient-to-br from-secondary/40 to-primary/20 rounded-xl transform-gpu rotate-x-12 -rotate-y-12 group-hover:rotate-x-45 group-hover:-rotate-y-45 transition-transform duration-700 shadow-2xl"></div>
+<span class="absolute material-symbols-outlined text-4xl text-white/50 group-hover:text-secondary transition-colors">ecg_heart</span>
+</div>
+<div class="p-6">
+<h6 class="font-headline-md text-headline-md mb-1">Cardio-Shield</h6>
+<p class="text-on-surface-variant font-label-sm text-label-sm mb-4">Heart Support Alpha</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-primary">$82.00</span>
+<div class="flex items-center gap-1 text-on-surface-variant text-[10px] uppercase font-bold">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Stock: 09
+                                </div>
+</div>
+</div>
+</div>
+<!-- Med Card 3 -->
+<div class="glass-card rounded-3xl overflow-hidden group">
+<div class="h-48 relative bg-surface-container-highest/50 flex items-center justify-center perspective-1000">
+<div class="w-24 h-24 bg-gradient-to-br from-on-surface-variant/40 to-white/10 rounded-xl transform-gpu rotate-x-12 rotate-y-12 group-hover:rotate-x-45 group-hover:rotate-y-45 transition-transform duration-700 shadow-2xl"></div>
+<span class="absolute material-symbols-outlined text-4xl text-white/50 group-hover:text-white transition-colors">science</span>
+</div>
+<div class="p-6">
+<h6 class="font-headline-md text-headline-md mb-1">Immune-X</h6>
+<p class="text-on-surface-variant font-label-sm text-label-sm mb-4">Synthetic Peptide Serum</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-primary">$120.00</span>
+<div class="flex items-center gap-1 text-on-surface-variant text-[10px] uppercase font-bold">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Stock: 05
+                                </div>
+</div>
+</div>
+</div>
+<!-- Med Card 4 -->
+<div class="glass-card rounded-3xl overflow-hidden group mt-12">
+<div class="h-48 relative bg-surface-container-highest/50 flex items-center justify-center perspective-1000">
+<div class="w-24 h-24 bg-gradient-to-br from-error/40 to-primary/20 rounded-xl transform-gpu -rotate-x-12 rotate-y-12 group-hover:-rotate-x-45 group-hover:rotate-y-45 transition-transform duration-700 shadow-2xl"></div>
+<span class="absolute material-symbols-outlined text-4xl text-white/50 group-hover:text-error transition-colors">pill</span>
+</div>
+<div class="p-6">
+<h6 class="font-headline-md text-headline-md mb-1">Zen-Sleep</h6>
+<p class="text-on-surface-variant font-label-sm text-label-sm mb-4">Deep REM Modulator</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-primary">$35.00</span>
+<div class="flex items-center gap-1 text-on-surface-variant text-[10px] uppercase font-bold">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Stock: 31
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 6: Statistics -->
+<section class="py-32 px-margin-desktop bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
+<div class="text-center">
+<div class="font-headline-xl text-headline-xl text-primary mb-2">50K+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Monthly Consults</div>
+</div>
+<div class="text-center">
+<div class="font-headline-xl text-headline-xl text-primary mb-2">99.8%</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">AI Accuracy</div>
+</div>
+<div class="text-center">
+<div class="font-headline-xl text-headline-xl text-primary mb-2">1M+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Verified Users</div>
+</div>
+<div class="text-center">
+<div class="font-headline-xl text-headline-xl text-primary mb-2">2min</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Avg. Delivery</div>
+</div>
+</div>
+</section>
+<!-- Section 7: Testimonials (Auto-Slider Effect) -->
+<section class="py-32 px-margin-desktop overflow-hidden">
+<div class="max-w-container-max mx-auto">
+<h2 class="font-headline-lg text-headline-lg mb-16">Trusted by the Future-Forward</h2>
+<div class="flex gap-8 animate-[scroll_40s_linear_infinite] whitespace-nowrap">
+<!-- Repeated Testimonial Cards for Infinite Loop effect -->
+<div class="glass-card p-10 rounded-3xl min-w-[400px] inline-block whitespace-normal">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-primary/20"></div>
+<div>
+<div class="font-headline-md text-headline-md text-primary">Sarah Chen</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">CTO, Neuroflow</div>
+</div>
+</div>
+<p class="font-body-md text-body-md italic text-on-surface">"The AI diagnosis was spot on. I've never experienced medical care this efficient and accurate."</p>
+</div>
+<div class="glass-card p-10 rounded-3xl min-w-[400px] inline-block whitespace-normal">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-secondary/20"></div>
+<div>
+<div class="font-headline-md text-headline-md text-secondary">Marcus Thorne</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Venture Partner</div>
+</div>
+</div>
+<p class="font-body-md text-body-md italic text-on-surface">"Finally, a healthcare platform that feels like it was built in the 21st century. Flawless UI."</p>
+</div>
+<div class="glass-card p-10 rounded-3xl min-w-[400px] inline-block whitespace-normal">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-on-surface-variant/20"></div>
+<div>
+<div class="font-headline-md text-headline-md text-on-surface-variant">Dr. Julian Reed</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Physician</div>
+</div>
+</div>
+<p class="font-body-md text-body-md italic text-on-surface">"The clinical depth of the PharmaCare AI engine is truly remarkable. It's a game-changer for practitioners."</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 8: Download App -->
+<section class="py-32 px-margin-desktop">
+<div class="max-w-container-max mx-auto glass-card rounded-[48px] p-16 flex flex-col lg:flex-row items-center gap-16 overflow-hidden relative">
+
+<div class="flex-1 relative z-10">
+<h2 class="font-headline-lg text-headline-lg mb-8">Your Health, <br/>In Your Pocket.</h2>
+<p class="text-on-surface-variant font-body-lg mb-12">The complete PharmaCare experience, optimized for iOS and Android. Real-time biometric tracking and instant consultation at your fingertips.</p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-on-surface text-surface px-8 py-4 rounded-2xl flex items-center gap-3 font-bold group">
+<span class="material-symbols-outlined text-3xl">phone_iphone</span>
+<div class="text-left">
+<div class="text-[10px] uppercase">Download on the</div>
+<div class="text-lg leading-tight">App Store</div>
+</div>
+</button>
+<button class="bg-on-surface text-surface px-8 py-4 rounded-2xl flex items-center gap-3 font-bold">
+<span class="material-symbols-outlined text-3xl">play_books</span>
+<div class="text-left">
+<div class="text-[10px] uppercase">Get it on</div>
+<div class="text-lg leading-tight">Google Play</div>
+</div>
+</button>
+</div>
+</div>
+<div class="flex-1 relative">
+<div class="relative z-10 w-64 md:w-80 glass-card p-4 rounded-[3rem] border-[8px] border-white/5 shadow-2xl animate-float">
+<div class="bg-surface rounded-[2.5rem] overflow-hidden aspect-[9/19]">
+<img class="w-full h-full object-cover" data-alt="A futuristic smartphone app interface showing a glowing 3D medical dashboard. The screen displays a heart rate graph in emerald green, a holographic avatar for a consultation, and medication reminders. The lighting is dark-mode focused with high-contrast text and sleek, glassmorphic UI components. The phone is floating in a dark emerald environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLzwajSVcy1lcaZLcu3tgJp3S_BAkJEjTSQmhmY3zxo0iXmK4Mlpbo4UzgXsFiUGIcQSOoKssxXIGCMW2c0CwzbuX2t05fpaObRD4r73SFkMxPgk7i04qBvOFSSR_oLWxZ9ggXA-fp_-g1OZRwgS3EdJ7zXWxVApCFpHwAYPchEWzc8PYgvxoYziTo25m2-7Zy4wJ1UecGpkY2IMJDYkiysN1m7ncmgaPuSvMTVtAnKi7YC706dGAEX2FYOQIco1kvUoE94RTeblU"/>
+</div>
+</div>
+<!-- Background Decor for phone -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 blur-[120px] rounded-full"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-32 px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-white/5 bg-surface">
+<div class="col-span-1 md:col-span-1">
+<div class="font-headline-md text-headline-md text-primary mb-8 font-bold">PharmaCare</div>
+<p class="text-on-surface-variant font-body-md mb-8">Redefining health through precision intelligence and human-centric design.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 glass-card rounded-full flex items-center justify-center hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">share</span>
+</a>
+<a class="w-10 h-10 glass-card rounded-full flex items-center justify-center hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">language</span>
+</a>
+</div>
+</div>
+<div>
+<h6 class="font-headline-md text-headline-md mb-8">Platform</h6>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">AI Diagnostics</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Telemedicine</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Smart Pharmacy</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Product Roadmap</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-headline-md text-headline-md mb-8">Company</h6>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Clinical Trials</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">FDA Compliance</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Contact Support</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Privacy Policy</a></li>
+</ul>
+</div>
+<div class="flex flex-col justify-between">
+<div>
+<h6 class="font-headline-md text-headline-md mb-8">Newsletter</h6>
+<div class="relative">
+<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-on-surface font-label-sm text-label-sm focus:outline-none focus:border-primary transition-colors" placeholder="Email address" type="email"/>
+<button class="absolute right-2 top-2 w-8 h-8 bg-primary rounded-lg text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="text-on-surface-variant font-label-sm text-label-sm mt-12 md:mt-0">
+                © 2024 PharmaCare AI. Precision Health Excellence.
+            </div>
+</div>
+</footer>
+<script>
+        // Micro-interactions & Mouse Parallax
+        const engine = document.getElementById('parallax-engine');
+        const heroSection = document.getElementById('hero-engine');
+
+        window.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 40;
+            const y = (window.innerHeight / 2 - e.pageY) / 40;
+            
+            if (engine) {
+                engine.style.transform = `rotateX(${y}deg) rotateY(${-x}deg)`;
+            }
+        });
+
+        // Magnetic Button Effect
+        document.querySelectorAll('.magnetic-btn').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.05)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0) scale(1)';
+            });
+        });
+
+        // Smooth reveal on scroll (optional lightweight implementation)
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+            observer.observe(card);
+        });
+    </script>
+</body></html>
