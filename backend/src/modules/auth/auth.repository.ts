@@ -1,6 +1,5 @@
 import { prisma } from '../../prisma/client';
 import { UserRole } from '../../constants';
-import { Prisma } from '@prisma/client';
 
 export class AuthRepository {
   public static async findUserByIdentifier(identifier: string) {
