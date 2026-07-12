@@ -44,11 +44,11 @@ const envSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().default('mock_razorpay_secret'),
 });
 
-const _env = envSchema.safeParse(process.env);
+const parsedEnv = envSchema.safeParse(process.env);
 
-if (!_env.success) {
-  console.error('❌ Invalid environment variables detected:', _env.error.format());
+if (!parsedEnv.success) {
+  console.error('❌ Invalid environment variables detected:', parsedEnv.error.format());
   throw new Error('Invalid environment configuration. Please check your .env file.');
 }
 
-export const env = _env.data;
+export const env = parsedEnv.data;
