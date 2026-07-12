@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { TriageLevel } from '../../constants';
 
 export const AiChatSchema = z.object({
   body: z.object({
