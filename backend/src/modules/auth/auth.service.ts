@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import { AuthRepository } from './auth.repository';
 import { SignupDto, LoginDto, OtpVerifyDto, ForgotPasswordDto, ResetPasswordDto, GoogleLoginDto } from './auth.dto';
 import { AppError } from '../../helpers/error.helper';
-import { HTTP_STATUS, ERROR_CODES, UserRole } from '../../constants';
+import { HTTP_STATUS, ERROR_CODES } from '../../constants';
 import { CryptoHelper, JwtHelper, redis } from '../../utils';
 import { logger } from '../../logger';
 import { prisma } from '../../prisma/client';
@@ -208,10 +208,9 @@ export class AuthService {
   }
 
   public static async refreshTokenRotation(token: string, ip?: string, userAgent?: string) {
-    let decoded: { userId: string };
     try {
-      decoded = JwtHelper.verifyRefreshToken(token);
-    } catch (error) {
+      JwtHelper.verifyRefreshToken(token);
+    } catch {
       throw new AppError(
         'Invalid or expired refresh token. Please login again.',
         HTTP_STATUS.UNAUTHORIZED,
