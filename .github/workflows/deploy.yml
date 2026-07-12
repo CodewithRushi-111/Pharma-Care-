@@ -1,0 +1,98 @@
+name: Pharma Care Enterprise CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, staging ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-and-test:
+    name: Lint, Typecheck & Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: pharma_care_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Generate Prisma ORM Client
+        working-directory: ./backend
+        run: npx prisma generate
+
+      - name: Run TypeScript Strict Typecheck
+        working-directory: ./backend
+        run: npx tsc --noEmit
+
+      - name: Run Oxlint Check
+        working-directory: ./backend
+        run: npm run lint --if-present
+
+      - name: Run Automated Tests
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://postgres:testpassword@localhost:5432/pharma_care_test?schema=public
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          JWT_SECRET: test_jwt_access_secret_key_2026
+          REFRESH_TOKEN_SECRET: test_jwt_refresh_secret_key_2026
+          GEMINI_API_KEY: mock_gemini_api_key
+        run: npm test
+
+  build-docker:
+    name: Build Multi-stage Docker Image
+    needs: verify-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Production Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false # Set true and configure credentials when container registry secret added
+          tags: pharmacare/enterprise-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
