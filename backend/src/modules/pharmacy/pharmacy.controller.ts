@@ -55,8 +55,6 @@ export class PharmacyController {
   public static async uploadPrescription(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.id;
-      // Get patientId
-      const patient = await (req as any).patient || { id: userId }; // Will query in service if needed or middleware
       const result = await PharmacyService.uploadPrescription(userId, req.file?.buffer);
       ResponseHelper.success(res, result, 'Prescription uploaded and queued for verification.', HTTP_STATUS.CREATED);
     } catch (error) {
