@@ -4,6 +4,7 @@ import { Mic, MicOff, Video, VideoOff, PhoneOff, Clipboard, Plus } from 'lucide-
 
 export default function Consultation({ selectedDoctor, addPrescription }) {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('live'); // 'live', 'schedule', 'history'
   const [micActive, setMicActive] = useState(true);
   const [videoActive, setVideoActive] = useState(true);
   const [showNotes, setShowNotes] = useState(true);
@@ -14,6 +15,13 @@ export default function Consultation({ selectedDoctor, addPrescription }) {
   const [frequency, setFrequency] = useState('');
   const [duration, setDuration] = useState('');
   const [prescribedItems, setPrescribedItems] = useState([]);
+
+  // Consultancy Maintenance State
+  const [consultancyList, setConsultancyList] = useState([
+    { id: 'APT-4421', doctor: 'Dr. Evelyn Rao', specialty: 'General Medicine', date: 'Today, 4:30 PM', fee: '₹500', status: 'Ready to Join', notes: 'Routine checkup & Amoxicillin verification' },
+    { id: 'APT-8912', doctor: 'Dr. Rajesh Nair', specialty: 'Cardiology', date: 'Tomorrow, 11:00 AM', fee: '₹800', status: 'Scheduled', notes: 'Post-discharge ECG and vitals review' },
+    { id: 'APT-3301', doctor: 'Dr. Priya Desai', specialty: 'Pediatrics', date: 'Jul 14, 2:00 PM', fee: '₹600', status: 'Confirmed', notes: 'Child vaccination schedule review' }
+  ]);
 
   const doctorName = selectedDoctor ? selectedDoctor.doctor : 'Dr. Evelyn Rao';
   const specialty = selectedDoctor ? selectedDoctor.specialty : 'General Medicine';
@@ -37,7 +45,6 @@ export default function Consultation({ selectedDoctor, addPrescription }) {
   };
 
   const handleCompleteConsult = () => {
-    // Save generated prescription
     const newRx = {
       id: `RX-${Math.floor(100000 + Math.random() * 900000)}`,
       doctor: doctorName,
@@ -52,8 +59,109 @@ export default function Consultation({ selectedDoctor, addPrescription }) {
     navigate('/prescription');
   };
 
+  const handleStatusUpdate = (aptId, newStatus) => {
+    setConsultancyList(prev => prev.map(a => a.id === aptId ? { ...a, status: newStatus } : a));
+    alert(`Consultancy session ${aptId} status updated to: ${newStatus}`);
+  };
+
   return (
-    <div style={{
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Top Consultancy Suite Navigation Tabs */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-surface)', padding: '16px 24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+        <div>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', marginBottom: '4px' }}>Telemedicine &amp; Consultancy Suite</h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Manage clinical schedules, live WebRTC rooms, and prescription verification maintenance.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {[
+            { id: 'live', label: '🎥 Live Consultation Room' },
+            { id: 'schedule', label: '📅 Consultancy Maintenance' },
+            { id: 'history', label: '📋 Prescription Archive' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: activeTab === tab.id ? 'var(--color-primary)' : 'var(--color-surface-alt)',
+                color: activeTab === tab.id ? 'white' : 'var(--color-text-primary)',
+                cursor: 'pointer',
+                fontWeight: activeTab === tab.id ? '600' : '500',
+                fontSize: '0.85rem'
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* TAB 2: CONSULTANCY MAINTENANCE & DOCTOR SCHEDULES */}
+      {activeTab === 'schedule' && (
+        <div style={{ backgroundColor: 'var(--color-surface)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>Scheduled Consultancy Sessions &amp; Roster Maintenance</h3>
+            <button className="btn btn-primary" onClick={() => navigate('/doctors')} style={{ fontSize: '0.85rem', padding: '8px 16px' }}>
+              + Schedule New Consult
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {consultancyList.map(apt => (
+              <div key={apt.id} style={{ padding: '16px', backgroundColor: 'var(--color-surface-alt)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                    <span className="mono-text" style={{ fontWeight: '700', color: 'var(--color-primary)' }}>{apt.id}</span>
+                    <span className={`badge ${apt.status.includes('Ready') ? 'badge-success' : 'badge-warning'}`}>{apt.status}</span>
+                  </div>
+                  <h4 style={{ fontSize: '1.05rem', marginBottom: '4px' }}>{apt.doctor} <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>({apt.specialty})</span></h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Time: <strong>{apt.date}</strong> &bull; Fee: <strong>{apt.fee}</strong> &bull; Notes: {apt.notes}</p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="btn btn-accent" onClick={() => setActiveTab('live')} style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
+                    Enter Live Room
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => handleStatusUpdate(apt.id, 'Rescheduled / Maintained')} style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
+                    Maintain Status
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: PRESCRIPTION ARCHIVE & VERIFICATION LOGS */}
+      {activeTab === 'history' && (
+        <div style={{ backgroundColor: 'var(--color-surface)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', marginBottom: '16px' }}>Verified Clinical Prescriptions &amp; Audit Trail</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[
+              { id: 'RX-94021', doctor: 'Dr. Evelyn Rao', specialty: 'General Medicine', date: 'July 09, 2026', items: 'Amoxicillin 500mg, Paracetamol 650mg', status: 'Verification Passed' },
+              { id: 'RX-88102', doctor: 'Dr. Rajesh Nair', specialty: 'Cardiology', date: 'July 04, 2026', items: 'Atorvastatin 20mg, Aspirin 75mg', status: 'Dispensed & Delivered' }
+            ].map((rx, idx) => (
+              <div key={idx} style={{ padding: '16px', backgroundColor: 'var(--color-surface-alt)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                    <span className="mono-text" style={{ fontWeight: '700', color: 'var(--color-accent)' }}>{rx.id}</span>
+                    <span className="badge badge-success">{rx.status}</span>
+                  </div>
+                  <h4 style={{ fontSize: '1rem', marginBottom: '4px' }}>Issued by {rx.doctor} ({rx.specialty})</h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Date: {rx.date} &bull; Script: <strong>{rx.items}</strong></p>
+                </div>
+                <button className="btn btn-primary" onClick={() => navigate('/pharmacy')} style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
+                  Order from Pharmacy
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 1: LIVE VIDEO STREAM ROOM */}
+      {activeTab === 'live' && (
+        <div style={{
       display: 'flex',
       backgroundColor: '#16171d', // Dark canvas area for focus
       height: 'calc(100vh - var(--header-height) - 64px)',
@@ -260,5 +368,7 @@ export default function Consultation({ selectedDoctor, addPrescription }) {
         </div>
       )}
     </div>
+  )}
+</div>
   );
 }
