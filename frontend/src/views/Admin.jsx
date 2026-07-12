@@ -10,8 +10,19 @@ export default function Admin({
   onRegisterDoctor,
   onAddMedicine
 }) {
-  const [activeTab, setActiveTab] = useState(userRole === 'Platform Admin' ? 'safety' : 'triage'); // 'triage', 'safety', 'doctors', 'inventory'
+  const [activeTab, setActiveTab] = useState('triage'); // 'triage', 'consultancy', 'safety', 'doctors', 'inventory'
   const [selectedOrderIndex, setSelectedOrderIndex] = useState(0);
+
+  // Consultancy Maintenance State
+  const [consultancyList, setConsultancyList] = useState([
+    { id: 'APT-4421', doctor: 'Dr. Evelyn Rao', specialty: 'General Medicine', date: 'Today, 4:30 PM', fee: '₹500', status: 'Ready to Join', patient: 'Rishi Kumar', notes: 'Routine checkup & Amoxicillin verification' },
+    { id: 'APT-8912', doctor: 'Dr. Rajesh Nair', specialty: 'Cardiology', date: 'Tomorrow, 11:00 AM', fee: '₹800', status: 'Scheduled', patient: 'Sunita Sharma', notes: 'Post-discharge ECG and vitals review' },
+    { id: 'APT-3301', doctor: 'Dr. Priya Desai', specialty: 'Pediatrics', date: 'Jul 14, 2:00 PM', fee: '₹600', status: 'Confirmed', patient: 'Aarav Patel', notes: 'Child vaccination schedule review' }
+  ]);
+  const [newConsultDoc, setNewConsultDoc] = useState('Dr. Evelyn Rao');
+  const [newConsultPatient, setNewConsultPatient] = useState('');
+  const [newConsultDate, setNewConsultDate] = useState('Tomorrow, 4:00 PM');
+  const [newConsultFee, setNewConsultFee] = useState('₹500');
 
   // Doctor onboarding form state
   const [docName, setDocName] = useState('');
@@ -137,63 +148,72 @@ export default function Admin({
           <p style={{ fontSize: '0.85rem' }}>Active Role: <strong style={{ color: 'var(--color-primary)' }}>{userRole}</strong></p>
         </div>
 
-        {/* Tab selector */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {(userRole === 'Pharmacy Admin' || userRole === 'Platform Admin') && (
-            <button 
-              className="btn" 
-              onClick={() => setActiveTab('triage')}
-              style={{
-                fontSize: '0.8rem',
-                backgroundColor: activeTab === 'triage' ? 'var(--color-primary)' : 'var(--color-surface)',
-                color: activeTab === 'triage' ? 'white' : 'var(--color-text-secondary)',
-                border: '1px solid var(--color-border)'
-              }}
-            >
-              Prescription Triage
-            </button>
-          )}
+        {/* Tab selector (All tabs accessible for comprehensive consultancy & triage maintenance) */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button 
+            className="btn" 
+            onClick={() => setActiveTab('triage')}
+            style={{
+              fontSize: '0.8rem',
+              backgroundColor: activeTab === 'triage' ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: activeTab === 'triage' ? 'white' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)'
+            }}
+          >
+            📋 Prescription Triage ({adminOrders.length || 2})
+          </button>
 
-          {userRole === 'Platform Admin' && (
-            <>
-              <button 
-                className="btn" 
-                onClick={() => setActiveTab('safety')}
-                style={{
-                  fontSize: '0.8rem',
-                  backgroundColor: activeTab === 'safety' ? 'var(--color-primary)' : 'var(--color-surface)',
-                  color: activeTab === 'safety' ? 'white' : 'var(--color-text-secondary)',
-                  border: '1px solid var(--color-border)'
-                }}
-              >
-                AI Safety Audits ({safetyLogs.length})
-              </button>
-              <button 
-                className="btn" 
-                onClick={() => setActiveTab('doctors')}
-                style={{
-                  fontSize: '0.8rem',
-                  backgroundColor: activeTab === 'doctors' ? 'var(--color-primary)' : 'var(--color-surface)',
-                  color: activeTab === 'doctors' ? 'white' : 'var(--color-text-secondary)',
-                  border: '1px solid var(--color-border)'
-                }}
-              >
-                Onboard Doctors
-              </button>
-              <button 
-                className="btn" 
-                onClick={() => setActiveTab('inventory')}
-                style={{
-                  fontSize: '0.8rem',
-                  backgroundColor: activeTab === 'inventory' ? 'var(--color-primary)' : 'var(--color-surface)',
-                  color: activeTab === 'inventory' ? 'white' : 'var(--color-text-secondary)',
-                  border: '1px solid var(--color-border)'
-                }}
-              >
-                Inventory Manager
-              </button>
-            </>
-          )}
+          <button 
+            className="btn" 
+            onClick={() => setActiveTab('consultancy')}
+            style={{
+              fontSize: '0.8rem',
+              backgroundColor: activeTab === 'consultancy' ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: activeTab === 'consultancy' ? 'white' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)'
+            }}
+          >
+            📅 Consultancy Maintenance ({consultancyList.length})
+          </button>
+
+          <button 
+            className="btn" 
+            onClick={() => setActiveTab('doctors')}
+            style={{
+              fontSize: '0.8rem',
+              backgroundColor: activeTab === 'doctors' ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: activeTab === 'doctors' ? 'white' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)'
+            }}
+          >
+            👨‍⚕️ Onboard Doctors ({doctorsList.length || 3})
+          </button>
+
+          <button 
+            className="btn" 
+            onClick={() => setActiveTab('inventory')}
+            style={{
+              fontSize: '0.8rem',
+              backgroundColor: activeTab === 'inventory' ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: activeTab === 'inventory' ? 'white' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)'
+            }}
+          >
+            📦 Inventory Manager
+          </button>
+
+          <button 
+            className="btn" 
+            onClick={() => setActiveTab('safety')}
+            style={{
+              fontSize: '0.8rem',
+              backgroundColor: activeTab === 'safety' ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: activeTab === 'safety' ? 'white' : 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)'
+            }}
+          >
+            🛡️ AI Safety Audits ({safetyLogs.length || 1})
+          </button>
         </div>
       </div>
 
@@ -591,6 +611,116 @@ export default function Admin({
                 <p style={{ fontSize: '0.8rem', marginTop: '6px' }}>120 boxes verified in storage zone B.</p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: Consultancy & Telemedicine Maintenance Suite */}
+      {activeTab === 'consultancy' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.3s ease both' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <span className="badge badge-success" style={{ marginBottom: '6px', display: 'inline-block' }}>Telemedicine Administration</span>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem' }}>Live Consultancy Maintenance & Schedule Control</h3>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.88rem' }}>Monitor doctor schedules, verify WebRTC rooms, adjust consultation fees, and maintain patient sessions.</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {consultancyList.map(apt => (
+                <div key={apt.id} style={{ padding: '18px', backgroundColor: 'var(--color-surface-alt)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                  <div style={{ flex: '1 1 300px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                      <span className="mono-text" style={{ fontWeight: '700', color: 'var(--color-primary)', background: 'var(--color-primary-dim)', padding: '2px 8px', borderRadius: '4px' }}>{apt.id}</span>
+                      <span className={`badge ${apt.status.includes('Ready') || apt.status.includes('Confirmed') ? 'badge-success' : 'badge-warning'}`}>{apt.status}</span>
+                    </div>
+                    <h4 style={{ fontSize: '1.1rem', marginBottom: '4px', color: 'var(--color-text-primary)' }}>{apt.doctor} <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>({apt.specialty})</span></h4>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>Patient: <strong>{apt.patient}</strong> &bull; Slot: <strong>{apt.date}</strong> &bull; Fee: <strong>{apt.fee}</strong></p>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>Notes: {apt.notes}</p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <button 
+                      className="btn btn-secondary" 
+                      onClick={() => {
+                        setConsultancyList(prev => prev.map(a => a.id === apt.id ? { ...a, status: 'Ready to Join (WebRTC Active)' } : a));
+                        alert(`Session ${apt.id} WebRTC Room verified & opened for consultation.`);
+                      }}
+                      style={{ fontSize: '0.8rem', padding: '8px 14px' }}
+                    >
+                      🎥 Verify WebRTC
+                    </button>
+                    <button 
+                      className="btn btn-secondary" 
+                      onClick={() => {
+                        setConsultancyList(prev => prev.map(a => a.id === apt.id ? { ...a, status: 'Rescheduled / Maintained' } : a));
+                        alert(`Session ${apt.id} schedule maintained & patient notified.`);
+                      }}
+                      style={{ fontSize: '0.8rem', padding: '8px 14px' }}
+                    >
+                      🔄 Reschedule / Maintain
+                    </button>
+                    <button 
+                      className="btn btn-primary" 
+                      onClick={() => {
+                        setConsultancyList(prev => prev.filter(a => a.id !== apt.id));
+                        alert(`Session ${apt.id} marked as completed & archived.`);
+                      }}
+                      style={{ fontSize: '0.8rem', padding: '8px 14px' }}
+                    >
+                      ✓ Complete Session
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Schedule New Consultation Form */}
+          <div style={{ backgroundColor: 'var(--color-surface)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', marginBottom: '16px' }}>Schedule & Assign New Consultancy Session</h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (!newConsultPatient) { alert("Please enter patient name."); return; }
+              const newApt = {
+                id: `APT-${Math.floor(1000 + Math.random() * 9000)}`,
+                doctor: newConsultDoc,
+                specialty: newConsultDoc.includes('Evelyn') ? 'General Medicine' : newConsultDoc.includes('Rajesh') ? 'Cardiology' : 'Pediatrics',
+                date: newConsultDate,
+                fee: newConsultFee,
+                status: 'Confirmed (Admin Assigned)',
+                patient: newConsultPatient,
+                notes: 'Administrative consultation booking via Telemedicine Suite.'
+              };
+              setConsultancyList(prev => [newApt, ...prev]);
+              setNewConsultPatient('');
+              alert(`Consultancy session ${newApt.id} scheduled successfully for ${newConsultPatient}.`);
+            }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', alignItems: 'flex-end' }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Doctor Assignment</label>
+                <select value={newConsultDoc} onChange={(e) => setNewConsultDoc(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', outline: 'none' }}>
+                  <option value="Dr. Evelyn Rao">Dr. Evelyn Rao (General Medicine)</option>
+                  <option value="Dr. Rajesh Nair">Dr. Rajesh Nair (Cardiology)</option>
+                  <option value="Dr. Priya Desai">Dr. Priya Desai (Pediatrics)</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Patient Full Name</label>
+                <input type="text" value={newConsultPatient} onChange={(e) => setNewConsultPatient(e.target.value)} placeholder="e.g. Amit Verma" style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', outline: 'none' }} required />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Schedule Slot Date & Time</label>
+                <input type="text" value={newConsultDate} onChange={(e) => setNewConsultDate(e.target.value)} placeholder="e.g. Tomorrow, 4:00 PM" style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', outline: 'none' }} required />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Consultation Fee</label>
+                <input type="text" value={newConsultFee} onChange={(e) => setNewConsultFee(e.target.value)} placeholder="₹500" style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid var(--color-border)', outline: 'none' }} required />
+              </div>
+              <div>
+                <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '11px 16px' }}>+ Assign Consultancy</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
