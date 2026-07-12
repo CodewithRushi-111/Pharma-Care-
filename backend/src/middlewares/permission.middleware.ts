@@ -26,7 +26,7 @@ export const requirePermission = (permission: string) => {
       if (cachedPermissions) {
         permissions = JSON.parse(cachedPermissions);
       } else {
-        const userWithRole = await prisma.user.findUnique({
+        await prisma.user.findUnique({
           where: { id: req.user.id },
           include: {
             // In a dynamic permission model or default role mapping
