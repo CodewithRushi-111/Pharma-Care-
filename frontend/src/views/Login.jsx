@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, CheckCircle2, Shield } from 'lucide-react';
 
-export default function Login({ setLoggedIn, setUserRole, setUserName }) {
+export default function Login({ setLoggedIn, setUserRole, setUserName, onReturnToLanding }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login'); // 'login', 'signup'
   const [email, setEmail] = useState('patient@pharmacare.com');
@@ -40,39 +40,49 @@ export default function Login({ setLoggedIn, setUserRole, setUserName }) {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      minHeight: 'calc(100vh - 120px)',
-      backgroundColor: 'var(--color-surface)',
-      borderRadius: 'var(--radius-lg)',
-      overflow: 'hidden',
-      boxShadow: 'var(--shadow-lg)'
-    }}>
-      {/* Left Column: Branding Illustration Panel */}
-      <div style={{
-        flex: 1.2,
-        background: 'linear-gradient(135deg, var(--color-primary) 0%, #254a40 100%)',
-        color: 'white',
-        padding: '64px',
+    <div 
+      className="login-container-card"
+      style={{
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
+        minHeight: 'calc(100vh - 120px)',
+        backgroundColor: 'var(--color-surface)',
+        borderRadius: 'var(--radius-lg)',
+        overflow: 'hidden',
+        boxShadow: 'var(--shadow-lg)'
+      }}
+    >
+      <style>{`
+        @media (max-width: 900px) {
+          .login-container-card { flex-direction: column !important; min-height: auto !important; }
+          .login-illustration-panel { display: none !important; }
+          .login-form-panel { padding: 32px 20px !important; }
+        }
+      `}</style>
+
+      {/* Left Column: Branding Illustration Panel */}
+      <div 
+        className="login-illustration-panel"
+        style={{
+          flex: 1.2,
+          background: 'linear-gradient(135deg, var(--color-primary) 0%, #254a40 100%)',
+          color: 'white',
+          padding: '64px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
         {/* Logo mark */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', zIndex: 2 }}>
-          <img
-            src="/logo.png"
-            alt="Pharma Care Logo"
-            style={{ width: '44px', height: '44px', objectFit: 'contain', borderRadius: '8px' }}
-          />
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: '700', letterSpacing: '0.5px', color: 'var(--color-bg)' }}>Pharma Care</span>
+          <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'white', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', fontSize: '1.2rem' }}>⚕</div>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: '700', letterSpacing: '0.5px', color: '#ffffff' }}>Pharma Care</span>
         </div>
 
         {/* Branding Message */}
-        <div style={{ zIndex: 2, maxWidth: '480px', margin: '48px 0' }}>
-          <h1 style={{ color: 'var(--color-bg)', fontFamily: 'var(--font-display)', fontSize: '2.8rem', lineHeight: '1.2', marginBottom: '20px' }}>
+        <div style={{ zIndex: 2, maxWidth: '480px', margin: '48px 0', textAlign: 'left' }}>
+          <h1 style={{ color: '#ffffff', fontFamily: 'var(--font-display)', fontSize: '2.8rem', lineHeight: '1.2', marginBottom: '20px' }}>
             Clinical trust meets digital speed.
           </h1>
           <p style={{ color: 'rgba(250, 249, 246, 0.8)', fontSize: '1.05rem', marginBottom: '32px' }}>
@@ -118,16 +128,39 @@ export default function Login({ setLoggedIn, setUserRole, setUserName }) {
       </div>
 
       {/* Right Column: Authentication form */}
-      <div style={{
-        flex: 1,
-        padding: '64px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        backgroundColor: 'var(--color-surface)'
-      }}>
+      <div 
+        className="login-form-panel"
+        style={{
+          flex: 1,
+          padding: '64px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          backgroundColor: 'var(--color-surface)'
+        }}
+      >
         <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
           
+          <button
+            type="button"
+            onClick={() => { if (onReturnToLanding) onReturnToLanding(); else navigate('/'); }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-primary)',
+              fontSize: '0.85rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              marginBottom: '20px',
+              padding: 0
+            }}
+          >
+            ← Return to 3D Landing Page
+          </button>
+
           {/* Role selector selector cards */}
           <div style={{ marginBottom: '24px' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', color: 'var(--color-text-secondary)', display: 'block', marginBottom: '8px' }}>
