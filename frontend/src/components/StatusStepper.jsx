@@ -1,12 +1,19 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-export default function StatusStepper({ steps, currentStepIndex }) {
+export default function StatusStepper({ 
+  steps = ['Placed', 'Verification', 'Confirmed', 'Shipped', 'Delivered'], 
+  currentStepIndex,
+  statusIndex 
+}) {
+  const activeIndex = currentStepIndex !== undefined ? currentStepIndex : (statusIndex !== undefined ? statusIndex : 1);
+  const safeSteps = Array.isArray(steps) ? steps : [];
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '24px 0', overflowX: 'auto' }}>
-      {steps.map((step, idx) => {
-        const isCompleted = idx < currentStepIndex;
-        const isActive = idx === currentStepIndex;
+    <div style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '16px 0', overflowX: 'auto' }}>
+      {safeSteps.map((step, idx) => {
+        const isCompleted = idx < activeIndex;
+        const isActive = idx === activeIndex;
         
         return (
           <React.Fragment key={idx}>
@@ -56,12 +63,12 @@ export default function StatusStepper({ steps, currentStepIndex }) {
               </span>
             </div>
             
-            {idx < steps.length - 1 && (
+            {idx < safeSteps.length - 1 && (
               <div 
                 style={{
                   flex: 1,
                   height: '3px',
-                  backgroundColor: idx < currentStepIndex ? 'var(--color-primary)' : 'var(--color-border)',
+                  backgroundColor: idx < activeIndex ? 'var(--color-primary)' : 'var(--color-border)',
                   margin: '0 -20px 20px -20px',
                   zIndex: 1,
                   transition: 'background-color 0.3s ease'
