@@ -2,7 +2,7 @@ import { prisma } from '../../prisma/client';
 import { CreateMedicineDto, CreateCouponDto } from './admin.dto';
 
 export class AdminRepository {
-  public static async verifyDoctorStatus(doctorId: string, status: string, rejectionReason?: string) {
+  public static async verifyDoctorStatus(doctorId: string, status: string, _rejectionReason?: string) {
     return prisma.doctor.update({
       where: { id: doctorId },
       data: { verificationStatus: status },
