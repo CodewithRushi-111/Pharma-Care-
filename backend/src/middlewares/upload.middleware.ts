@@ -3,7 +3,6 @@ import { v2 as cloudinary } from 'cloudinary';
 import { env } from '../config/env';
 import { AppError } from '../helpers/error.helper';
 import { HTTP_STATUS, ERROR_CODES } from '../constants';
-import path from 'path';
 
 cloudinary.config({
   cloud_name: env.CLOUDINARY_CLOUD_NAME,
