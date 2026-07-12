@@ -2,5 +2,9 @@
   "categories": {
     "correctness": "warn",
     "suspicious": "warn"
+  },
+  "rules": {
+    "typescript/no-extraneous-class": "off",
+    "eslint/no-underscore-dangle": "off"
   }
 }
