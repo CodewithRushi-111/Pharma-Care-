@@ -8,6 +8,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().transform((val) => parseInt(val, 10)).default('5000'),
   API_PREFIX: z.string().default('/api/v1'),
+  CORS_ORIGIN: z.string().optional(),
 
   DATABASE_URL: z.string().default('postgresql://postgres:postgres@localhost:5432/pharma_care?schema=public'),
 

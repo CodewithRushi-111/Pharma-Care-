@@ -29,9 +29,25 @@ app.use(
   })
 );
 
+const getCorsOrigins = (): string[] | boolean => {
+  if (process.env.NODE_ENV !== 'production') {
+    return true;
+  }
+  const origins = [
+    'https://pharmacare.local',
+    'https://www.pharmacare.local',
+    'https://pharma-care-wine.vercel.app',
+  ];
+  if (env.CORS_ORIGIN) {
+    const customOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+    origins.push(...customOrigins);
+  }
+  return origins;
+};
+
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production' ? ['https://pharmacare.local', 'https://www.pharmacare.local'] : true,
+    origin: getCorsOrigins(),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
