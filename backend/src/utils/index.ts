@@ -10,7 +10,7 @@ const redisOptions: any = {
   password: env.REDIS_PASSWORD || undefined,
   lazyConnect: env.NODE_ENV === 'test',
   maxRetriesPerRequest: null,
-  retryStrategy(times) {
+  retryStrategy(times: number) {
     const delay = Math.min(times * 50, 2000);
     return delay;
   },
