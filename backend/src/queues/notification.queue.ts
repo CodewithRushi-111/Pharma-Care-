@@ -2,12 +2,18 @@ import { Queue, QueueOptions } from 'bullmq';
 import { env } from '../config/env';
 import { logger } from '../logger';
 
+const connectionOptions: any = {
+  host: env.REDIS_HOST,
+  port: env.REDIS_PORT,
+  password: env.REDIS_PASSWORD || undefined,
+};
+
+if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
+  connectionOptions.tls = {};
+}
+
 const queueOptions: QueueOptions = {
-  connection: {
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
-    password: env.REDIS_PASSWORD || undefined,
-  },
+  connection: connectionOptions,
   defaultJobOptions: {
     attempts: 3,
     backoff: {

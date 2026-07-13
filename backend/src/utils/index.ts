@@ -4,7 +4,7 @@ import Redis from 'ioredis';
 import { env } from '../config/env';
 import { logger } from '../logger';
 
-export const redis = new Redis({
+const redisOptions: any = {
   host: env.REDIS_HOST,
   port: env.REDIS_PORT,
   password: env.REDIS_PASSWORD || undefined,
@@ -14,7 +14,13 @@ export const redis = new Redis({
     const delay = Math.min(times * 50, 2000);
     return delay;
   },
-});
+};
+
+if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
+  redisOptions.tls = {};
+}
+
+export const redis = new Redis(redisOptions);
 
 redis.on('connect', () => logger.info('✅ Redis Cache connected successfully'));
 redis.on('error', (err) => logger.error('❌ Redis Connection Error:', err));

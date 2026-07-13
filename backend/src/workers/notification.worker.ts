@@ -4,12 +4,18 @@ import { env } from '../config/env';
 import { logger } from '../logger';
 import { prisma } from '../prisma/client';
 
+const connectionOptions: any = {
+  host: env.REDIS_HOST,
+  port: env.REDIS_PORT,
+  password: env.REDIS_PASSWORD || undefined,
+};
+
+if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
+  connectionOptions.tls = {};
+}
+
 const workerOptions: WorkerOptions = {
-  connection: {
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
-    password: env.REDIS_PASSWORD || undefined,
-  },
+  connection: connectionOptions,
   concurrency: 5,
 };
 
