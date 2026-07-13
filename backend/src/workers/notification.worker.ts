@@ -11,7 +11,7 @@ const connectionOptions: any = {
 };
 
 if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
-  connectionOptions.tls = {};
+  connectionOptions.tls = { rejectUnauthorized: false };
 }
 
 const workerOptions: WorkerOptions = {

@@ -17,7 +17,7 @@ const redisOptions: any = {
 };
 
 if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
-  redisOptions.tls = {};
+  redisOptions.tls = { rejectUnauthorized: false };
 }
 
 export const redis = new Redis(redisOptions);
