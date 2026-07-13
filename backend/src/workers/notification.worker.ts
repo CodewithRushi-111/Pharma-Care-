@@ -1,21 +1,31 @@
 import { Worker, Job, WorkerOptions } from 'bullmq';
+import Redis from 'ioredis';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env';
 import { logger } from '../logger';
 import { prisma } from '../prisma/client';
 
-const connectionOptions: any = {
-  host: env.REDIS_HOST,
-  port: env.REDIS_PORT,
-  password: env.REDIS_PASSWORD || undefined,
+const createConnection = () => {
+  if (env.REDIS_URL) {
+    return new Redis(env.REDIS_URL, {
+      maxRetriesPerRequest: null,
+      tls: env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+    });
+  }
+  const opts: any = {
+    host: env.REDIS_HOST,
+    port: env.REDIS_PORT,
+    password: env.REDIS_PASSWORD || undefined,
+    maxRetriesPerRequest: null,
+  };
+  if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
+    opts.tls = { rejectUnauthorized: false };
+  }
+  return new Redis(opts);
 };
 
-if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
-  connectionOptions.tls = { rejectUnauthorized: false };
-}
-
 const workerOptions: WorkerOptions = {
-  connection: connectionOptions,
+  connection: createConnection(),
   concurrency: 5,
 };
 

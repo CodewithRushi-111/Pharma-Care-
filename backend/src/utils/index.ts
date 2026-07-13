@@ -4,23 +4,37 @@ import Redis from 'ioredis';
 import { env } from '../config/env';
 import { logger } from '../logger';
 
-const redisOptions: any = {
-  host: env.REDIS_HOST,
-  port: env.REDIS_PORT,
-  password: env.REDIS_PASSWORD || undefined,
-  lazyConnect: env.NODE_ENV === 'test',
-  maxRetriesPerRequest: null,
-  retryStrategy(times: number) {
-    const delay = Math.min(times * 50, 2000);
-    return delay;
-  },
+const createRedisClient = () => {
+  if (env.REDIS_URL) {
+    return new Redis(env.REDIS_URL, {
+      lazyConnect: env.NODE_ENV === 'test',
+      maxRetriesPerRequest: null,
+      retryStrategy(times: number) {
+        return Math.min(times * 50, 2000);
+      },
+      tls: env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+    });
+  }
+
+  const redisOptions: any = {
+    host: env.REDIS_HOST,
+    port: env.REDIS_PORT,
+    password: env.REDIS_PASSWORD || undefined,
+    lazyConnect: env.NODE_ENV === 'test',
+    maxRetriesPerRequest: null,
+    retryStrategy(times: number) {
+      return Math.min(times * 50, 2000);
+    },
+  };
+
+  if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
+    redisOptions.tls = { rejectUnauthorized: false };
+  }
+
+  return new Redis(redisOptions);
 };
 
-if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
-  redisOptions.tls = { rejectUnauthorized: false };
-}
-
-export const redis = new Redis(redisOptions);
+export const redis = createRedisClient();
 
 redis.on('connect', () => logger.info('✅ Redis Cache connected successfully'));
 redis.on('error', (err) => logger.error(`❌ Redis Connection Error: ${err instanceof Error ? err.message : String(err)}`));

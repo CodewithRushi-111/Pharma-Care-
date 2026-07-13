@@ -11,6 +11,7 @@ const envSchema = z.object({
 
   DATABASE_URL: z.string().default('postgresql://postgres:postgres@localhost:5432/pharma_care?schema=public'),
 
+  REDIS_URL: z.string().optional(),
   REDIS_HOST: z.string().default('localhost'),
   REDIS_PORT: z.string().transform((val) => parseInt(val, 10)).default('6379'),
   REDIS_PASSWORD: z.string().optional().default(''),
