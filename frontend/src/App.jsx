@@ -12,6 +12,7 @@ import Admin from './views/Admin';
 import Login from './views/Login';
 import LandingPage from './views/LandingPage';
 import Navbar from './components/Navbar';
+import { authAPI, pharmacyAPI, doctorAPI, aiAPI, adminAPI } from './services/api';
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -46,11 +47,49 @@ function AppContent() {
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  useEffect(() => {
+    const handleLogout = () => {
+      setLoggedIn(false);
+      setUserRole('Patient');
+      setUserName('Rishi Kumar');
+      setShowLanding(true);
+      navigate('/');
+    };
+    window.addEventListener('auth-logout', handleLogout);
+    return () => window.removeEventListener('auth-logout', handleLogout);
+  }, [navigate]);
+
   /* ── Auth State ─────────────────────────────────────────────── */
   const [showLanding, setShowLanding] = useState(true);
-  const [isLoggedIn, setLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState('Patient');
-  const [userName, setUserName] = useState('Rishi Kumar');
+  const [isLoggedIn, setLoggedIn] = useState(() => !!localStorage.getItem('accessToken'));
+  const [userRole, setUserRole] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        let displayRole = 'Patient';
+        if (parsed.role === 'DOCTOR') displayRole = 'Doctor';
+        else if (parsed.role === 'PHARMACY_ADMIN') displayRole = 'Pharmacy Admin';
+        else if (parsed.role === 'PLATFORM_ADMIN' || parsed.role === 'SUPER_ADMIN') displayRole = 'Platform Admin';
+        return displayRole;
+      } catch (e) {
+        return 'Patient';
+      }
+    }
+    return 'Patient';
+  });
+  const [userName, setUserName] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        return parsed.email.split('@')[0];
+      } catch (e) {
+        return 'Rishi Kumar';
+      }
+    }
+    return 'Rishi Kumar';
+  });
 
   /* ── Shared Dynamic Datasets ────────────────────────────────── */
   const [safetyLogs, setSafetyLogs] = useState([]);
@@ -87,22 +126,145 @@ function AppContent() {
   const [prescriptions, setPrescriptions] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
 
-  /* ── Cart Management ────────────────────────────────────────── */
-  const addToCart = useCallback((med) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.id === med.id);
-      if (existing) return prev.map(item => item.id === med.id ? { ...item, quantity: item.quantity + 1 } : item);
-      return [...prev, { ...med, quantity: 1 }];
-    });
-    alert(`${med.name} added to cart.`);
-  }, []);
+  /* ── Live Backend Data Loading ──────────────────────────────── */
+  useEffect(() => {
+    const loadAppData = async () => {
+      try {
+        const medRes = await pharmacyAPI.getMedicines();
+        if (medRes && medRes.success && medRes.data && medRes.data.items) {
+          const mappedMeds = medRes.data.items.map(m => ({
+            id: m.id,
+            name: m.brandName,
+            generic: m.genericName,
+            category: m.category?.name || 'Pain Relief',
+            price: Number(m.mrp),
+            requiresRx: m.requiresPrescription,
+            inStock: m.inventory && m.inventory.some(inv => inv.totalQuantity > 0),
+            details: `${m.dosageForm} - ${m.strength}. Class: ${m.scheduleType}.`,
+            precautions: 'Follow standard physician advice.',
+            sideEffects: 'Mild gastrointestinal discomfort, drowsiness.',
+            genericAlternative: m.primarySubstitutes && m.primarySubstitutes.length > 0 ? {
+              id: m.primarySubstitutes[0].substituteMedicine.id,
+              name: m.primarySubstitutes[0].substituteMedicine.brandName,
+              price: Number(m.primarySubstitutes[0].substituteMedicine.mrp),
+              requiresRx: m.primarySubstitutes[0].substituteMedicine.requiresPrescription,
+              generic: `${m.primarySubstitutes[0].substituteMedicine.genericName} (Generic Substitute)`
+            } : null,
+            raw: m
+          }));
+          setMedicinesList(mappedMeds);
+        }
+      } catch (err) {
+        console.error('Failed to load medicines from backend:', err);
+      }
 
-  const addCartItems  = useCallback((items) => items.forEach(item => addToCart(item)), [addToCart]);
-  const removeFromCart  = useCallback((id) => setCart(prev => prev.filter(item => item.id !== id)), []);
-  const updateCartQuantity = useCallback((id, qty) => {
-    if (qty <= 0) { removeFromCart(id); return; }
-    setCart(prev => prev.map(item => item.id === id ? { ...item, quantity: qty } : item));
-  }, [removeFromCart]);
+      try {
+        const docRes = await doctorAPI.getDoctors();
+        if (docRes && docRes.success && docRes.data && docRes.data.items) {
+          const mappedDocs = docRes.data.items.map(d => ({
+            id: d.id,
+            name: d.user?.email ? `Dr. ${d.user.email.split('@')[0].split('.')[1] || d.user.email.split('@')[0]}` : 'Dr. Sharma',
+            specialty: d.specialization,
+            exp: `${d.experienceYears} years`,
+            rating: 4.9,
+            slots: d.timeSlots || [],
+            fee: Number(d.consultationFee),
+            bio: d.bio,
+            raw: d
+          }));
+          setDoctorsList(mappedDocs);
+        }
+      } catch (err) {
+        console.error('Failed to load doctors from backend:', err);
+      }
+
+      if (isLoggedIn) {
+        try {
+          const cartRes = await pharmacyAPI.getCart();
+          if (cartRes && cartRes.success && cartRes.data && cartRes.data.items) {
+            const mappedCart = cartRes.data.items.map(item => ({
+              id: item.medicine.id,
+              name: item.medicine.brandName,
+              generic: item.medicine.genericName,
+              price: Number(item.medicine.mrp),
+              requiresRx: item.medicine.requiresPrescription,
+              quantity: item.quantity,
+              inStock: true
+            }));
+            setCart(mappedCart);
+          }
+        } catch (err) {
+          console.error('Failed to load cart from backend:', err);
+        }
+      }
+    };
+
+    loadAppData();
+  }, [isLoggedIn]);
+
+  /* ── Cart Management ────────────────────────────────────────── */
+  const addToCart = useCallback(async (med) => {
+    try {
+      if (isLoggedIn) {
+        setCart(prev => {
+          const existing = prev.find(item => item.id === med.id);
+          const newQty = existing ? existing.quantity + 1 : 1;
+          
+          // Make async call in background to update cart
+          if (existing) {
+            pharmacyAPI.updateCartItem(med.id, newQty).catch(console.error);
+          } else {
+            pharmacyAPI.addToCart(med.id, 1).catch(console.error);
+          }
+
+          if (existing) return prev.map(item => item.id === med.id ? { ...item, quantity: item.quantity + 1 } : item);
+          return [...prev, { ...med, quantity: 1 }];
+        });
+      } else {
+        setCart(prev => {
+          const existing = prev.find(item => item.id === med.id);
+          if (existing) return prev.map(item => item.id === med.id ? { ...item, quantity: item.quantity + 1 } : item);
+          return [...prev, { ...med, quantity: 1 }];
+        });
+      }
+      alert(`${med.name} added to cart.`);
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+    }
+  }, [isLoggedIn]);
+
+  const addCartItems = useCallback(async (items) => {
+    for (const item of items) {
+      await addToCart(item);
+    }
+  }, [addToCart]);
+
+  const removeFromCart = useCallback(async (id) => {
+    try {
+      if (isLoggedIn) {
+        pharmacyAPI.updateCartItem(id, 0).catch(console.error);
+      }
+      setCart(prev => prev.filter(item => item.id !== id));
+    } catch (err) {
+      console.error('Error removing from cart:', err);
+    }
+  }, [isLoggedIn]);
+
+  const updateCartQuantity = useCallback(async (id, qty) => {
+    if (qty <= 0) {
+      removeFromCart(id);
+      return;
+    }
+    try {
+      if (isLoggedIn) {
+        pharmacyAPI.updateCartItem(id, qty).catch(console.error);
+      }
+      setCart(prev => prev.map(item => item.id === id ? { ...item, quantity: qty } : item));
+    } catch (err) {
+      console.error('Error updating cart quantity:', err);
+    }
+  }, [isLoggedIn, removeFromCart]);
+
   const clearCart = useCallback(() => setCart([]), []);
 
   /* ── Orders & Appointments ──────────────────────────────────── */
@@ -300,7 +462,7 @@ function AppContent() {
           <button
             className="nav-link"
             style={{ border: 'none', background: 'transparent', width: '100%', textAlign: 'left', cursor: 'pointer', color: 'var(--color-text-muted)', marginBottom: '4px' }}
-            onClick={() => { setLoggedIn(false); setShowLanding(true); navigate('/'); }}
+            onClick={() => authAPI.logout()}
           >
             <span className="nav-icon"><LogOut size={17} /></span>
             Sign Out
@@ -330,7 +492,7 @@ function AppContent() {
           <div className="header-actions">
             {/* Switch Role — hide on very small screens */}
             <button
-              onClick={() => { setLoggedIn(false); navigate('/login'); }}
+              onClick={() => authAPI.logout()}
               className="btn btn-secondary hide-mobile"
               style={{ fontSize: '0.78rem', padding: '7px 14px', borderRadius: 'var(--radius-full)', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
               title="Switch Role"

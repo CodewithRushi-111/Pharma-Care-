@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PrescriptionBadge from '../components/PrescriptionBadge';
 import LeftAccentCard from '../components/LeftAccentCard';
 import InfoDisclaimer from '../components/InfoDisclaimer';
 import { Search, ShoppingCart, UploadCloud, Check, FileText, X } from 'lucide-react';
+import { pharmacyAPI } from '../services/api';
 
 export default function Pharmacy({ cart, addToCart, removeFromCart, updateCartQuantity, clearCart, checkoutOrders, medicinesList = [] }) {
   const navigate = useNavigate();
@@ -13,6 +14,40 @@ export default function Pharmacy({ cart, addToCart, removeFromCart, updateCartQu
   const [prescriptionFile, setPrescriptionFile] = useState(null);
   const [checkoutStep, setCheckoutStep] = useState('catalog'); // 'catalog', 'cart', 'checkout', 'success'
   const [latestOrderId, setLatestOrderId] = useState('');
+
+  const [stores, setStores] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedStoreId, setSelectedStoreId] = useState('');
+  const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('CARD');
+  const [couponCode, setCouponCode] = useState('');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  useEffect(() => {
+    if (checkoutStep === 'cart') {
+      const fetchStoresAndAddresses = async () => {
+        try {
+          const storesRes = await pharmacyAPI.getStores();
+          if (storesRes && storesRes.success && storesRes.data) {
+            setStores(storesRes.data);
+            if (storesRes.data.length > 0) {
+              setSelectedStoreId(storesRes.data[0].id);
+            }
+          }
+          const addrRes = await pharmacyAPI.getAddresses();
+          if (addrRes && addrRes.success && addrRes.data) {
+            setAddresses(addrRes.data);
+            if (addrRes.data.length > 0) {
+              setSelectedAddressId(addrRes.data[0].id);
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching stores or addresses:', err);
+        }
+      };
+      fetchStoresAndAddresses();
+    }
+  }, [checkoutStep]);
 
   const categories = ['All', 'Pain Relief', 'Antibiotics', 'Vitamins', 'Veg-Caps', 'Digestive Health'];
 
@@ -46,27 +81,60 @@ export default function Pharmacy({ cart, addToCart, removeFromCart, updateCartQu
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (cartRequiresRx && !prescriptionFile) {
       alert("Please upload your digital prescription (Rx) to checkout prescription-required medicines.");
       return;
     }
 
-    const newOrder = {
-      id: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
-      items: cart.map(item => `${item.name} x${item.quantity}`),
-      statusIndex: cartRequiresRx ? 1 : 2, // 1 = Verification queue, 2 = Confirmed/Shipped
-      date: new Date().toISOString().split('T')[0],
-      total: cartTotal,
-      hasRx: cartRequiresRx,
-      prescriptionName: prescriptionFile ? prescriptionFile.name : 'uploaded_prescription.jpg'
-    };
+    if (!selectedStoreId || !selectedAddressId) {
+      alert("Please select a pharmacy store and delivery address.");
+      return;
+    }
 
-    checkoutOrders(newOrder);
-    setLatestOrderId(newOrder.id);
-    clearCart();
-    setPrescriptionFile(null);
-    setCheckoutStep('success');
+    setIsPlacingOrder(true);
+    try {
+      let prescriptionUploadId = undefined;
+      if (cartRequiresRx && prescriptionFile) {
+        const rxRes = await pharmacyAPI.uploadPrescription(prescriptionFile);
+        if (rxRes && rxRes.success && rxRes.data) {
+          prescriptionUploadId = rxRes.data.id;
+        }
+      }
+
+      const checkoutPayload = {
+        storeId: selectedStoreId,
+        deliveryAddressId: selectedAddressId,
+        prescriptionUploadId,
+        couponCode: couponCode || undefined,
+        paymentMethod
+      };
+
+      const orderRes = await pharmacyAPI.checkout(checkoutPayload);
+      if (orderRes && orderRes.success && orderRes.data) {
+        const orderData = orderRes.data.order;
+        const newOrder = {
+          id: orderData.orderNumber || orderData.id,
+          items: cart.map(item => `${item.name} x${item.quantity}`),
+          statusIndex: orderData.orderStatus === 'PENDING_PRESCRIPTION' ? 1 : 2, // 1 = Verification queue, 2 = Processing
+          date: new Date(orderData.createdAt).toISOString().split('T')[0],
+          total: Number(orderData.finalAmount),
+          hasRx: cartRequiresRx,
+          prescriptionName: prescriptionFile ? prescriptionFile.name : 'uploaded_prescription.jpg'
+        };
+
+        checkoutOrders(newOrder);
+        setLatestOrderId(newOrder.id);
+        clearCart();
+        setPrescriptionFile(null);
+        setCheckoutStep('success');
+      }
+    } catch (err) {
+      console.error('Checkout failed:', err);
+      alert(err.message || 'Checkout failed. Please check inventory stock and try again.');
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   return (
@@ -350,8 +418,109 @@ export default function Pharmacy({ cart, addToCart, removeFromCart, updateCartQu
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px' }}>
                   Order Summary
                 </h3>
+
+                {/* Pharmacy Store Dropdown */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>Fulfillment Pharmacy Store</label>
+                  <select 
+                    value={selectedStoreId} 
+                    onChange={(e) => setSelectedStoreId(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface-alt)',
+                      color: 'var(--color-text-primary)',
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {stores.length === 0 ? (
+                      <option value="">No stores available</option>
+                    ) : (
+                      stores.map(store => (
+                        <option key={store.id} value={store.id}>
+                          {store.name} ({store.city})
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Delivery Address Dropdown */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>Delivery Address</label>
+                  <select 
+                    value={selectedAddressId} 
+                    onChange={(e) => setSelectedAddressId(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface-alt)',
+                      color: 'var(--color-text-primary)',
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {addresses.length === 0 ? (
+                      <option value="">No addresses found</option>
+                    ) : (
+                      addresses.map(addr => (
+                        <option key={addr.id} value={addr.id}>
+                          {addr.addressLine1}, {addr.city} - {addr.postalCode}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Payment Method Selector */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>Payment Method</label>
+                  <select 
+                    value={paymentMethod} 
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface-alt)',
+                      color: 'var(--color-text-primary)',
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="CARD">Credit/Debit Card</option>
+                    <option value="COD">Cash on Delivery (COD)</option>
+                    <option value="UPI">UPI Payment</option>
+                  </select>
+                </div>
+
+                {/* Coupon Code Input */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--color-text-secondary)' }}>Promo Code / Coupon</label>
+                  <input 
+                    type="text" 
+                    placeholder="Enter coupon (e.g. WELCOME20)" 
+                    value={couponCode} 
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface-alt)',
+                      color: 'var(--color-text-primary)',
+                      fontSize: '0.85rem',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                     <span>Items Subtotal</span>
                     <span className="mono-text">₹{cartSubtotal.toFixed(2)}</span>
@@ -370,8 +539,9 @@ export default function Pharmacy({ cart, addToCart, removeFromCart, updateCartQu
                   className="btn btn-primary" 
                   style={{ width: '100%', padding: '12px' }}
                   onClick={handlePlaceOrder}
+                  disabled={isPlacingOrder}
                 >
-                  Confirm and Place Order
+                  {isPlacingOrder ? 'Processing Order...' : 'Confirm and Place Order'}
                 </button>
                 
                 <p style={{ fontSize: '0.75rem', textAlign: 'center', marginTop: '8px' }}>

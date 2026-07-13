@@ -18,6 +18,8 @@ router.get('/medicines', validate(MedicineSearchSchema), PharmacyController.sear
 router.get('/medicines/:id', PharmacyController.getMedicineById);
 
 // Protected shopping cart & order checkout routes
+router.get('/stores', authenticate, PharmacyController.getStores);
+router.get('/addresses', authenticate, PharmacyController.getAddresses);
 router.get('/cart', authenticate, PharmacyController.getCart);
 router.post('/cart/items', authenticate, validate(AddToCartSchema), PharmacyController.addToCart);
 router.patch('/cart/items/:medicineId', authenticate, validate(UpdateCartItemSchema), PharmacyController.updateCartItem);

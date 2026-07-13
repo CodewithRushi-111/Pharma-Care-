@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { PharmacyService } from './pharmacy.service';
 import { ResponseHelper } from '../../helpers/response.helper';
 import { HTTP_STATUS } from '../../constants';
+import { prisma } from '../../prisma/client';
 
 export class PharmacyController {
   public static async searchMedicines(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -67,6 +68,30 @@ export class PharmacyController {
       const userId = req.user!.id;
       const result = await PharmacyService.checkoutOrder(userId, req.body);
       ResponseHelper.success(res, result, 'Order checked out successfully.', HTTP_STATUS.CREATED);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async getStores(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await prisma.pharmacyStore.findMany({ where: { isActive: true } });
+      ResponseHelper.success(res, result, 'Stores fetched successfully.', HTTP_STATUS.OK);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async getAddresses(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const patient = await prisma.patient.findUnique({ where: { userId } });
+      if (!patient) {
+        ResponseHelper.success(res, [], 'No patient profile found.', HTTP_STATUS.OK);
+        return;
+      }
+      const result = await prisma.address.findMany({ where: { patientId: patient.id } });
+      ResponseHelper.success(res, result, 'Addresses fetched successfully.', HTTP_STATUS.OK);
     } catch (error) {
       next(error);
     }

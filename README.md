@@ -221,15 +221,15 @@ When testing via `/login` or switching profiles from the top navigation bar, use
 
 | Persona Name | Role | Email | Password | Access Capabilities |
 | :--- | :--- | :--- | :--- | :--- |
-| **Rishi Kumar** | `Patient` | `patient@pharmacare.com` | `password` | Book doctors, order medicines, check AI symptom triage |
-| **Dr. Evelyn Rao** | `Doctor` | `doctor.rao@pharmacare.com` | `password` | Live WebRTC video rooms, consultancy maintenance, issue prescriptions |
-| **Meera Sen** | `Pharmacy Admin` | `meera.sen@pharmacare.com` | `password` | Verify Schedule H uploads, manage drug inventory & fulfillment |
-| **Super Admin** | `Platform Admin` | `admin@pharmacare.com` | `password` | Full system governance, Doctor onboarding, AI safety audit logs |
+| **Rahul (Patient)** | `Patient` | `patient.rahul@pharmacare.local` | `Enterprise@2026` | Book doctors, order medicines, check AI symptom triage |
+| **Dr. Sharma** | `Doctor` | `dr.sharma@pharmacare.local` | `Enterprise@2026` | Live WebRTC video rooms, consultancy maintenance, issue prescriptions |
+| **Pharmacy Admin** | `Pharmacy Admin` | `pharmacy@pharmacare.local` | `Enterprise@2026` | Verify Schedule H uploads, manage drug inventory & fulfillment |
+| **Platform Admin** | `Platform Admin` | `admin@pharmacare.local` | `Enterprise@2026` | Full system governance, Doctor onboarding, AI safety audit logs |
 
 ---
 
 ## 📜 Documentation & Specifications
-For detailed architectural diagrams, 3NF schema tables, DTO interface contracts, and 3D UI keyframes, please read the master specification: **[`design.md`](file:///c:/Users/Mrigesh%20koyande/OneDrive/Desktop/Pharma-Care/Pharma-Care-/design.md)**.
+For detailed architectural diagrams, 3NF schema tables, DTO interface contracts, and 3D UI keyframes, please read the master specification: **[design.md](design.md)**.
 
 ---
 <div align="center">

@@ -1,41 +1,64 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, CheckCircle2, Shield } from 'lucide-react';
+import { authAPI } from '../services/api';
 
 export default function Login({ setLoggedIn, setUserRole, setUserName, onReturnToLanding }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login'); // 'login', 'signup'
-  const [email, setEmail] = useState('patient@pharmacare.com');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('patient.rahul@pharmacare.local');
+  const [password, setPassword] = useState('Enterprise@2026');
   const [role, setRole] = useState('Patient'); // 'Patient', 'Doctor', 'Pharmacy Admin', 'Platform Admin'
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleRoleSelect = (selectedRole) => {
     setRole(selectedRole);
+    setErrorMsg('');
     if (selectedRole === 'Patient') {
-      setEmail('patient@pharmacare.com');
-      setUserName('Rishi Kumar');
+      setEmail('patient.rahul@pharmacare.local');
+      setPassword('Enterprise@2026');
     } else if (selectedRole === 'Doctor') {
-      setEmail('doctor.rao@pharmacare.com');
-      setUserName('Dr. Evelyn Rao');
+      setEmail('dr.sharma@pharmacare.local');
+      setPassword('Enterprise@2026');
     } else if (selectedRole === 'Pharmacy Admin') {
-      setEmail('meera.sen@pharmacare.com');
-      setUserName('Meera Sen');
+      setEmail('pharmacy@pharmacare.local');
+      setPassword('Enterprise@2026');
     } else if (selectedRole === 'Platform Admin') {
-      setEmail('admin@pharmacare.com');
-      setUserName('Super Admin');
+      setEmail('admin@pharmacare.local');
+      setPassword('Enterprise@2026');
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email && password) {
-      setUserRole(role);
-      if (role === 'Patient') setUserName('Rishi Kumar');
-      else if (role === 'Doctor') setUserName('Dr. Evelyn Rao');
-      else if (role === 'Pharmacy Admin') setUserName('Meera Sen');
-      else if (role === 'Platform Admin') setUserName('Super Admin');
-      setLoggedIn(true);
-      navigate('/');
+    if (!email || !password) return;
+
+    setErrorMsg('');
+    setLoading(true);
+    try {
+      const response = await authAPI.login(email, password);
+      if (response.success && response.data) {
+        const user = response.data.user;
+        
+        // Map backend roles back to display roles
+        let displayRole = 'Patient';
+        if (user.role === 'DOCTOR') displayRole = 'Doctor';
+        else if (user.role === 'PHARMACY_ADMIN') displayRole = 'Pharmacy Admin';
+        else if (user.role === 'PLATFORM_ADMIN' || user.role === 'SUPER_ADMIN') displayRole = 'Platform Admin';
+
+        setUserRole(displayRole);
+        setUserName(user.email.split('@')[0]);
+        setLoggedIn(true);
+        navigate('/');
+      } else {
+        setErrorMsg('Authentication failed. Invalid response structure.');
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || 'Incorrect credentials or server offline.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -285,17 +308,23 @@ export default function Login({ setLoggedIn, setUserRole, setUserName, onReturnT
               </div>
             </div>
 
+             {errorMsg && (
+              <div style={{ color: 'var(--color-error)', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', fontWeight: '500' }}>
+                {errorMsg}
+              </div>
+            )}
+
             {activeTab === 'login' && (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span className="caption" style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Demo pass: password</span>
+                <span className="caption" style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Demo pass: Enterprise@2026</span>
                 <a href="#forgot" style={{ fontSize: '0.8rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: '500' }}>
                   Forgot Password?
                 </a>
               </div>
             )}
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '12px', marginTop: '12px' }}>
-              Authenticate Role &rarr;
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '12px', marginTop: '12px' }} disabled={loading}>
+              {loading ? 'Authenticating...' : 'Authenticate Role →'}
             </button>
           </form>
         </div>
