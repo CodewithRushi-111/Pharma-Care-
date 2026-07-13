@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: pharma-care-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm run install-all && npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_HOST
+        value: pharmacare-redis-naikrishikesh01-8935.k.aivencloud.com
+      - key: REDIS_PORT
+        value: "27729"
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        value: super_secret_jwt_access_key_enterprise_2026
+      - key: API_PREFIX
+        value: /api/v1
+      - key: NODE_ENV
+        value: production
