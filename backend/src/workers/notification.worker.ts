@@ -55,7 +55,7 @@ export const startNotificationWorkers = () => {
   );
 
   emailWorker.on('completed', (job) => logger.info(`✅ [emailQueue] Job ${job.id} completed.`));
-  emailWorker.on('failed', (job, err) => logger.error(`❌ [emailQueue] Job ${job?.id} failed:`, err));
+  emailWorker.on('failed', (job, err) => logger.error(`❌ [emailQueue] Job ${job?.id} failed: ${err instanceof Error ? err.message : String(err)}`));
 
   // 2. SMS Worker
   const smsWorker = new Worker(
@@ -75,7 +75,7 @@ export const startNotificationWorkers = () => {
   );
 
   smsWorker.on('completed', (job) => logger.info(`✅ [smsQueue] Job ${job.id} completed.`));
-  smsWorker.on('failed', (job, err) => logger.error(`❌ [smsQueue] Job ${job?.id} failed:`, err));
+  smsWorker.on('failed', (job, err) => logger.error(`❌ [smsQueue] Job ${job?.id} failed: ${err instanceof Error ? err.message : String(err)}`));
 
   // 3. In-App & Multi-channel Notification Worker
   const notificationWorker = new Worker(
@@ -103,7 +103,7 @@ export const startNotificationWorkers = () => {
   );
 
   notificationWorker.on('completed', (job) => logger.info(`✅ [notificationQueue] Job ${job.id} completed.`));
-  notificationWorker.on('failed', (job, err) => logger.error(`❌ [notificationQueue] Job ${job?.id} failed:`, err));
+  notificationWorker.on('failed', (job, err) => logger.error(`❌ [notificationQueue] Job ${job?.id} failed: ${err instanceof Error ? err.message : String(err)}`));
 
   return { emailWorker, smsWorker, notificationWorker };
 };

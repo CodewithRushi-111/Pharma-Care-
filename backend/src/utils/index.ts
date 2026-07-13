@@ -23,7 +23,7 @@ if (env.REDIS_HOST !== 'localhost' && env.REDIS_HOST !== '127.0.0.1') {
 export const redis = new Redis(redisOptions);
 
 redis.on('connect', () => logger.info('✅ Redis Cache connected successfully'));
-redis.on('error', (err) => logger.error('❌ Redis Connection Error:', err));
+redis.on('error', (err) => logger.error(`❌ Redis Connection Error: ${err instanceof Error ? err.message : String(err)}`));
 
 export class CryptoHelper {
   public static hashToken(token: string): string {

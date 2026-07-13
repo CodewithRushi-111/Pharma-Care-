@@ -35,10 +35,10 @@ export const emailQueue = new Queue('emailQueue', queueOptions);
 export const smsQueue = new Queue('smsQueue', queueOptions);
 export const cleanupQueue = new Queue('cleanupQueue', queueOptions);
 
-notificationQueue.on('error', (err) => logger.error('❌ BullMQ notificationQueue error:', err));
-emailQueue.on('error', (err) => logger.error('❌ BullMQ emailQueue error:', err));
-smsQueue.on('error', (err) => logger.error('❌ BullMQ smsQueue error:', err));
-cleanupQueue.on('error', (err) => logger.error('❌ BullMQ cleanupQueue error:', err));
+notificationQueue.on('error', (err) => logger.error(`❌ BullMQ notificationQueue error: ${err instanceof Error ? err.message : String(err)}`));
+emailQueue.on('error', (err) => logger.error(`❌ BullMQ emailQueue error: ${err instanceof Error ? err.message : String(err)}`));
+smsQueue.on('error', (err) => logger.error(`❌ BullMQ smsQueue error: ${err instanceof Error ? err.message : String(err)}`));
+cleanupQueue.on('error', (err) => logger.error(`❌ BullMQ cleanupQueue error: ${err instanceof Error ? err.message : String(err)}`));
 
 export class QueueHelper {
   public static async dispatchEmail(data: {
